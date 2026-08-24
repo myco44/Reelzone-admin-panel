@@ -1,0 +1,2504 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reelzone Admin mobile- Movie Library</title>
+<style>
+  :root{
+    --bg:#0a0c12; --surface:#151824; --surface2:#1c2032;
+    --gold:#1ca9e0; --gold-dim:#0d5a78;
+    --ok:#4caf6d; --wait:#e0463c; --soon:#38bdf8; --red:#e0463c;
+    --text:#ffffff; --muted:#7f93b3; --rule:#252a3d;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:Georgia,serif;min-height:100vh;overflow-x:hidden;}
+  .wrap{max-width:640px;margin:0 auto;padding-bottom:60px;box-sizing:border-box;}
+  header{padding:24px 20px 16px;text-align:center;border-bottom:2px solid var(--rule);}
+  h1{font-family:'Impact','Arial Black',sans-serif;letter-spacing:2px;
+     background:linear-gradient(90deg, var(--red) 0%, var(--red) 35%, var(--gold) 65%, var(--gold) 100%);
+     -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:var(--gold);
+     text-transform:uppercase;font-size:22px;margin:0 0 4px;}
+  .sub{color:var(--muted);font-size:12px;letter-spacing:1px;}
+  main{padding:20px;}
+  .lock{padding:60px 20px;text-align:center;}
+  .lock p{color:var(--muted);font-size:13px;margin-bottom:16px;}
+  input,textarea,select{
+    width:100%;padding:13px;background:var(--surface);border:1px solid var(--rule);
+    color:var(--text);border-radius:8px;font-size:15px;font-family:Georgia,serif;margin-bottom:10px;
+  }
+  textarea{resize:vertical;min-height:70px;}
+  input::placeholder,textarea::placeholder{color:var(--muted);}
+  .btn{width:100%;padding:13px;background:var(--gold);color:#ffffff;border:none;border-radius:8px;
+       font-weight:bold;font-size:14px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;margin-top:4px;}
+  .btn.secondary{background:transparent;color:var(--gold);border:1px solid var(--gold-dim);}
+  .btn.danger{background:transparent;color:var(--wait);border:1px solid var(--wait);}
+  .btn.small{width:auto;padding:8px 14px;font-size:11px;}
+  .tabs{display:flex;border:1px solid var(--rule);border-radius:10px;overflow:hidden;margin-bottom:20px;flex-wrap:wrap;}
+  .tabs button{flex:1;min-width:80px;padding:10px 4px;background:var(--surface);color:var(--muted);
+               border:none;font-size:11px;letter-spacing:0.5px;text-transform:uppercase;cursor:pointer;font-family:inherit;}
+  .tabs button.active{background:var(--gold);color:#ffffff;font-weight:bold;}
+  .section{display:none;}
+  .section.active{display:block;}
+  .card{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;margin-bottom:10px;overflow:hidden;box-sizing:border-box;}
+  .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;min-width:0;}
+  .card-title-wrap{min-width:0;flex:1;}
+  .card-title{font-size:16px;font-weight:800;color:#ffffff;text-shadow:0 1px 6px rgba(0,0,0,0.6);overflow-wrap:anywhere;word-break:break-word;}
+  .card-meta{color:var(--muted);font-size:12px;margin-top:4px;}
+  .card-desc{color:#a9c3e8;font-size:13px;margin-top:8px;line-height:1.4;}
+  .stamp{font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:4px 8px;border-radius:999px;
+         font-family:Arial,sans-serif;font-weight:bold;border:2px solid;white-space:nowrap;}
+  .stamp.ipo{color:var(--soon);border-color:var(--soon);}
+  .stamp.bado{color:var(--wait);border-color:var(--wait);}
+  .stamp.inakuja{color:var(--soon);border-color:var(--soon);}
+  .card-actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+  .thumb{width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:10px;margin-bottom:10px;
+    border:1px solid var(--rule);box-shadow:0 8px 20px rgba(0,0,0,0.45);}
+  .form-box{background:var(--surface2);border:1px solid var(--rule);border-radius:10px;padding:16px;margin-bottom:20px;}
+  label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;display:block;margin-bottom:4px;}
+  .msg{text-align:center;font-size:12px;color:var(--wait);margin-top:8px;min-height:16px;}
+  .count{color:var(--muted);font-size:12px;margin-bottom:12px;letter-spacing:1px;}
+  .section-label{color:var(--gold);font-size:13px;font-weight:800;letter-spacing:0.5px;margin-bottom:8px;}
+  .cat-pill{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--rule);
+            border-radius:999px;padding:8px 14px;margin:4px;font-size:13px;}
+  .cat-pill.disabled{opacity:0.4;}
+  .toggle-mini{cursor:pointer;font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid var(--gold-dim);color:var(--gold);}
+  .toggle-mini.active{background:rgba(76,175,109,0.15);border-color:var(--ok);color:var(--ok);}
+  .empty{text-align:center;color:var(--muted);padding:30px 10px;font-size:13px;}
+  .logout-bar{text-align:right;padding:0 20px;margin-top:-8px;}
+  .logout-bar button{background:none;border:none;color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer;}
+  .chat-bubble{max-width:78%;padding:9px 13px;border-radius:12px;font-size:13px;line-height:1.4;}
+  .chat-bubble.user{align-self:flex-start;background:var(--surface2);border:1px solid var(--rule);border-bottom-left-radius:2px;}
+  .chat-bubble.admin{align-self:flex-end;background:var(--gold);color:#ffffff;border-bottom-right-radius:2px;}
+  .thread-item{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:12px 14px;
+    margin-bottom:8px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px;}
+  .thread-item:active{background:var(--surface2);}
+  .thread-name{font-weight:bold;font-size:14px;}
+  .thread-last{color:var(--muted);font-size:12px;margin-top:2px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px;}
+  .comments-admin-toggle{background:none;border:none;color:var(--gold);font-size:12px;cursor:pointer;
+    margin-top:10px;text-decoration:underline;padding:0;}
+  .comments-admin-section{display:none;margin-top:10px;border-top:1px solid var(--rule);padding-top:10px;}
+  .comments-admin-section.open{display:block;}
+  .comment-admin-item{background:var(--surface2);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:12px;
+    display:flex;justify-content:space-between;align-items:flex-start;gap:8px;}
+  .comment-admin-item.admin-reply{border-left:3px solid var(--gold);}
+  .comment-admin-item .c-author{font-weight:bold;color:var(--gold);font-size:11px;display:block;}
+  .comment-reply-row{display:flex;gap:6px;margin-top:8px;}
+  .comment-reply-row input{margin-bottom:0;flex:1;padding:9px;font-size:13px;}
+  .comment-reply-row button{width:auto;padding:9px 12px;font-size:12px;}
+  .profile-thumb{width:36px;height:36px;border-radius:50%;object-fit:cover;flex-shrink:0;}
+  .bulk-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;background:var(--surface2);
+    border:1px solid var(--rule);border-radius:10px;padding:10px 12px;margin-bottom:10px;}
+  .bulk-bar label{display:flex;align-items:center;gap:6px;margin:0;font-size:12px;color:var(--text);
+    text-transform:none;letter-spacing:0;}
+  .bulk-bar input[type=checkbox]{width:auto;margin:0;}
+  .movie-select{width:auto;margin:0 10px 0 0;flex-shrink:0;transform:scale(1.2);}
+  .card-top-row{display:flex;align-items:flex-start;gap:6px;min-width:0;flex:1;}
+  .card-top-row > div{min-width:0;flex:1;}
+  .ai-panel{background:var(--surface2);border:1px solid var(--gold-dim);border-radius:10px;
+    padding:14px 16px;margin-bottom:16px;}
+  .ai-panel h3{margin:0 0 8px;color:var(--gold);font-size:13px;letter-spacing:1px;text-transform:uppercase;}
+  .ai-log{font-size:12px;color:var(--muted);line-height:1.6;max-height:180px;overflow-y:auto;
+    background:var(--bg);border-radius:8px;padding:8px 10px;margin-top:8px;}
+  .ai-log .ok{color:var(--ok);}
+  .ai-log .warn{color:var(--wait);}
+  .missing-cat-row{display:flex;align-items:center;gap:8px;background:var(--bg);border-radius:8px;
+    padding:8px 10px;margin-top:6px;flex-wrap:wrap;}
+  .missing-cat-row span{font-size:12px;flex:1;min-width:120px;}
+  .missing-cat-row button{width:auto;padding:6px 10px;font-size:11px;margin:0;}
+  .notice-box{background:var(--surface2);border:1px solid var(--soon);border-radius:10px;
+    padding:12px 14px;margin-bottom:12px;font-size:12px;color:var(--text);line-height:1.5;}
+  .notice-box b{color:var(--soon);}
+
+  /* Bahati Nasibu (Lottery) admin */
+  .lottery-toggle-box{background:var(--surface2);border:1px solid var(--gold-dim);border-radius:10px;
+    padding:16px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;}
+  .lottery-toggle-box .lt-label{font-size:13px;line-height:1.5;}
+  .lottery-toggle-box .lt-label b{color:var(--gold);display:block;font-size:14px;margin-bottom:2px;}
+  .switch{position:relative;display:inline-block;width:50px;height:28px;flex-shrink:0;}
+  .switch input{opacity:0;width:0;height:0;}
+  .switch-slider{position:absolute;cursor:pointer;inset:0;background:var(--rule);border-radius:999px;transition:0.2s;}
+  .switch-slider::before{content:'';position:absolute;height:22px;width:22px;left:3px;bottom:3px;
+    background:#fff;border-radius:50%;transition:0.2s;}
+  .switch input:checked + .switch-slider{background:var(--ok);}
+  .switch input:checked + .switch-slider::before{transform:translateX(22px);}
+  .lottery-week-badge{display:inline-block;padding:5px 12px;border-radius:999px;font-size:11px;font-weight:800;
+    text-transform:uppercase;letter-spacing:0.5px;margin-bottom:12px;}
+  .lottery-week-badge.open{background:rgba(76,175,109,0.15);color:var(--ok);border:1px solid var(--ok);}
+  .lottery-week-badge.closed{background:rgba(224,70,60,0.15);color:var(--wait);border:1px solid var(--wait);}
+  .lottery-week-badge.pending{background:rgba(56,189,248,0.15);color:var(--soon);border:1px solid var(--soon);}
+  .winner-admin-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+    background:var(--surface2);border-radius:10px;padding:12px 14px;margin-bottom:8px;}
+  .winner-admin-row .w-name{font-weight:700;font-size:14px;}
+  .winner-admin-row .w-status{font-size:11px;color:var(--muted);display:block;margin-top:2px;}
+
+  /* Ma-DJ (DJ) admin */
+  .active-dj-bar{background:var(--surface2);border:1px solid var(--gold-dim);border-radius:10px;
+    padding:12px 14px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;}
+  .active-dj-bar .adb-label{font-size:12px;color:var(--muted);}
+  .active-dj-bar .adb-name{font-size:14px;font-weight:800;color:var(--gold);}
+  .dj-row{display:flex;align-items:center;gap:12px;background:var(--surface2);border-radius:10px;
+    padding:10px 12px;margin-bottom:8px;flex-wrap:wrap;}
+  .dj-row-photo, .dj-row-photo-ph{width:46px;height:46px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--surface);}
+  .dj-row-photo-ph{display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--gold);border:1px solid var(--rule);}
+  .dj-row-info{flex:1;min-width:120px;}
+  .dj-row-info .dr-name{font-weight:700;font-size:14px;}
+  .dj-row-info .dr-count{font-size:11px;color:var(--muted);}
+  .dj-row-actions{display:flex;gap:6px;flex-wrap:wrap;}
+
+  /* Responsive: kompyuta/skrini pana - list zinakuwa grid ya safu nyingi, form zinabaki rahisi kusoma */
+  @media (min-width: 860px) {
+    .wrap{max-width:1180px;padding-left:24px;padding-right:24px;box-sizing:border-box;}
+    .form-box{max-width:640px;}
+    #movieList, #productList, #branchList{
+      display:grid;grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));gap:14px;align-items:start;
+    }
+    #movieList .card, #productList .card, #branchList .card{margin-bottom:0;}
+  }
+  @media (min-width: 1200px) {
+    .wrap{max-width:1360px;}
+  }
+</style>
+</head>
+
+<body>
+<div class="wrap">
+  <header>
+    <h1>Reelzone Admin mobile </h1>
+    <div class="sub">Movie Library &mdash; Usimamizi</div>
+  </header>
+  <div id="lockScreen" class="lock">
+    <p>Ingia kwa akaunti ya Admin</p>
+    <input type="email" id="loginEmail" placeholder="Barua pepe">
+    <input type="password" id="loginPass" placeholder="Password">
+    <button class="btn" id="loginBtn">Ingia</button>
+    <div class="msg" id="loginMsg"></div>
+  </div>
+  <div id="app" style="display:none;">
+    <div class="logout-bar"><button id="logoutBtn">Toka &rarr;</button></div>
+    <main>
+      <div class="tabs">
+        <button class="tab-btn active" data-tab="movies">Movies</button>
+        <button class="tab-btn" data-tab="products">Bidhaa</button>
+        <button class="tab-btn" data-tab="categories">Category</button>
+        <button class="tab-btn" data-tab="branches">Ofisi</button>
+        <button class="tab-btn" data-tab="ads">Matangazo</button>
+        <button class="tab-btn" data-tab="chat">Chat</button>
+        <button class="tab-btn" data-tab="users">Wateja</button>
+        <button class="tab-btn" data-tab="lottery">&#127920; Bahati</button>
+        <button class="tab-btn" data-tab="djs">&#127911; DJ</button>
+        <button class="tab-btn" data-tab="stats">Takwimu</button>
+      </div>
+      <!-- MOVIES TAB -->
+      <div class="section active" id="tab-movies">
+        <div class="form-box" style="border-color:var(--gold-dim);">
+          <label>Ongeza Movie Nyingi kwa Wakati Mmoja (Bulk Paste)</label>
+          <label style="text-transform:none;letter-spacing:0;color:var(--text);font-size:12px;">
+          </label>
+          <input type="file" id="mTitlesImage" accept="image/*">
+          <button class="btn secondary" id="mReadImageBtn" style="margin-bottom:10px;">Chambua Picha na Uweke Majina</button>
+          <textarea id="mBulkTitles" placeholder="Bandika majina, moja kwa mstari, mfano:&#10;Fast X&#10;Kichekesho Episode 5&#10;Vipuli vya Mapenzi" style="min-height:100px;"></textarea>
+          <label>Category kwa zote (utahariri moja moja baadaye ukitaka)</label>
+          <select id="mBulkCategory"></select>
+          <label>Ofisi kwa zote</label>
+          <select id="mBulkBranch"></select>
+          <button class="btn secondary" id="mDetectDjBtn" style="background:transparent;border:1px solid var(--gold-dim);color:var(--gold);">
+            &#127911; Tambua Ma-DJ Kwenye Majina (AI)
+          </button>
+          <p style="color:var(--muted);font-size:11px;margin:4px 0 8px;">
+            Itasoma kila jina hapo juu, itambue kama lina jina la DJ ndani yake (hata likiwa limebandikwa bila
+            nafasi, mfano "babudj", au lina namba ya simu mwishoni), na kulilinganisha na Ma-DJ walioshasajiliwa
+            kwenye tab ya DJ. Namba za simu mwishoni hazichukuliwi kama sehemu ya jina la DJ; namba za Episode
+            (Ep 12 n.k) hazibadilishwi. DJ mpya wasiojulikana wataonyeshwa hapa chini ili uwaongeze kwa kubofya
+            kitufe kimoja.
+          </p>
+          <div class="ai-log" id="djDetectLog" style="display:none;"></div>
+          <div id="djMissingBox"></div>
+          <button class="btn secondary" id="mBulkAddBtn">Ongeza Zote (Bila Picha/Trailer)</button>
+          <p style="color:var(--muted);font-size:11px;margin-top:6px;">
+            Zitaongezwa zote kwa Hali "Ipo", bila picha wala trailer. Unaweza kuongeza picha/trailer/kubadilisha
+            category baadaye kwa kila moja kwenye orodha chini. Series zenye episode nyingi (mfano 30 mpaka 45)
+            zitachukuliwa episode ya kwanza na ya mwisho tu, za katikati zitaachwa moja kwa moja nakuzifuta.
+            Majina yaliyopo tayari (yamerudiwa) hayataongezwa mara ya pili. DJ zilizotambuliwa (kwa "Tambua
+            Ma-DJ" hapo juu) zitapangiwa moja kwa moja; zilizobaki bila DJ zitapata DJ Anayotumika Sasa (tab DJ)
+            kama upo.
+          </p>
+        </div>
+        <div class="ai-panel">
+          <h3>&#129302; AI &mdash; Panga Category Kiotomatiki</h3>
+          <p style="color:var(--muted);font-size:11px;margin:0 0 8px;">
+          prongram   itapitia movie kwenye orodha na kuzipanga kwenye category iliyopo kulingana na jina la movie.
+            Kama category inayofaa haipo, itakuambia uongeze, kisha bofya "Endelea" ili ipange iliyobaki.
+          </p>
+          <label style="display:block;">Funguo za Reelzone (unaweza kuweka nyingi, kila moja na jina)</label>
+          <div style="display:flex;gap:6px;">
+            <input type="text" id="aiKeyName" placeholder="Jina (mfano: Namba 1)" style="flex:1;">
+            <input type="password" id="aiKeyValue" placeholder="Bandika Funguo hapa" style="flex:2;">
+          </div>
+          <button class="btn secondary" id="aiKeyAddBtn" style="margin-top:6px;">+ Ongeza Funguo</button>
+          <div id="aiKeyList" style="margin-top:8px;"></div>
+          <label style="display:flex;align-items:center;gap:6px;margin:8px 0;text-transform:none;letter-spacing:0;font-size:12px;color:var(--text);">
+            <input type="checkbox" id="aiAutoCreateCat" style="width:auto;margin:0;"> Unda category zinazokosekana kiotomatiki (bila kuuliza)
+          </label>
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+            <label style="margin:0;white-space:nowrap;">Masaa ya Karibuni</label>
+            <input type="number" id="aiHoursWindow" value="24" min="1" style="margin:0;">
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="btn secondary" id="aiSortRecentBtn" style="width:100%;">Panga Zilizowekwa Muda Huu</button>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;">
+            <button class="btn secondary" id="aiSortSelectedBtn" style="width:auto;flex:1;">Panga Zilizochaguliwa</button>
+            <button class="btn secondary" id="aiSortAllBtn" style="width:auto;flex:1;">Panga Movie ZOTE</button>
+          </div>
+          <button class="btn" id="aiContinueBtn" style="display:none;margin-top:8px;background:var(--wait);">&#9654; Endelea Kupanga (Funguo Jipya Limeongezwa)</button>
+          <div id="aiMissingCatBox"></div>
+          <div class="ai-log" id="aiLog" style="display:none;"></div>
+          <hr style="border-color:var(--rule);margin:14px 0;">
+          <label style="display:block;color:var(--wait);">&#9888; Futa Movie Zilizowekwa Muda Fulani (Hatua ya Hatari)</label>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <label style="margin:0;white-space:nowrap;">Masaa</label>
+            <input type="number" id="deleteHoursWindow" value="1" min="1" style="margin:0;">
+            <button class="btn secondary" id="deleteRecentBtn" style="flex:1;border-color:var(--wait);color:var(--wait);">Futa Zilizowekwa Muda Huu</button>
+          </div>
+        </div>
+        <div class="form-box">
+          <label>Jina la Movie</label>
+          <input type="text" id="mTitle" placeholder="mfano: Fast X">
+          <label>Category</label>
+          <select id="mCategory"></select>
+          <label>Ofisi</label>
+          <select id="mBranch"></select>
+          <label>DJ Aliyetafsiri (hiari)</label>
+          <select id="mDj"></select>
+          <label>Hali</label>
+          <select id="mStatus">
+            <option value="ipo">Ipo</option>
+            <option value="inakuja">Inakuja</option>
+            <option value="bado">Bado</option>
+          </select>
+          <label>Maelezo (yatakayovutia wateja)</label>
+          <textarea id="mDesc" placeholder="mfano: Filamu ya aksheni yenye mzunguko wa magari..."></textarea>
+          <label>Picha ya Movie (hiari - ukiacha wazi na kuna Link ya Trailer, tutatumia picha ya video hiyo kiotomatiki, kama YouTube)</label>
+          <input type="file" id="mImage" accept="image/*">
+          <label>Link ya Trailer (YouTube - Unlisted)</label>
+          <input type="text" id="mTrailer" placeholder="mfano: https://youtube.com/watch?v=ABC123XYZ">
+          <button class="btn" id="mAddBtn">Ongeza Movie</button>
+        </div>
+        <div class="count" id="movieCount"></div>
+        <input type="text" id="movieSearchInput" placeholder="&#128269; Tafuta jina la movie..." style="margin-bottom:10px;">
+        <div class="bulk-bar">
+          <label><input type="checkbox" id="movieSelectAll"> Chagua Zote</label>
+          <button class="btn small secondary" id="deleteSelectedBtn" style="width:auto;">Futa Zilizochaguliwa (0)</button>
+          <button class="btn small danger" id="deleteAllMoviesBtn" style="width:auto;">Futa Movie ZOTE</button>
+          <button class="btn small secondary" id="cleanupEpisodesBtn" style="width:auto;">&#129529; Safisha Episode za Kati-Kati (Zote)</button>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;margin:8px 0 4px;">
+          <label style="margin:0;white-space:nowrap;font-size:12px;">Safisha za Masaa</label>
+          <input type="number" id="cleanupHoursWindow" value="24" min="1" style="margin:0;">
+          <button class="btn small secondary" id="cleanupRecentBtn" style="width:auto;flex:1;">&#129529; Safisha za Muda Huu Tu</button>
+        </div>
+        <div id="movieList"></div>
+      </div>
+      <!-- PRODUCTS TAB -->
+      <div class="section" id="tab-products">
+        <div class="form-box">
+          <label>Jina la Bidhaa</label>
+          <input type="text" id="pName" placeholder="mfano: Flash 32GB">
+          <label>Bei (TZS)</label>
+          <input type="number" id="pPrice" placeholder="mfano: 15000">
+          <label>Maelezo</label>
+          <textarea id="pDesc" placeholder="Maelezo mafupi ya bidhaa"></textarea>
+          <label>Ofisi (hiari)</label>
+          <select id="pBranch"></select>
+          <label>Hali ya Stock</label>
+          <select id="pStock">
+            <option value="true">Ipo Ofisini</option>
+            <option value="false">Imeisha</option>
+          </select>
+          <label>Picha ya Bidhaa</label>
+          <input type="file" id="pImage" accept="image/*">
+          <button class="btn" id="pAddBtn">Ongeza Bidhaa</button>
+        </div>
+        <div class="count" id="productCount"></div>
+        <div id="productList"></div>
+      </div>
+      <!-- CATEGORIES TAB -->
+      <div class="section" id="tab-categories">
+        <div class="form-box">
+          <label>Ongeza Category Mpya</label>
+          <input type="text" id="catName" placeholder="mfano: Kids Movies">
+          <button class="btn" id="catAddBtn">Ongeza Category</button>
+        </div>
+        <div id="catList"></div>
+        <p style="color:var(--muted);font-size:12px;margin-top:12px;">
+          Ukifungia (Disable) category, wateja hawataiona kabisa kwenye User App.
+        </p>
+      </div>
+      <!-- BRANCHES (OFISI) TAB -->
+      <div class="section" id="tab-branches">
+        <div class="form-box">
+          <label>Ongeza Ofisi Mpya</label>
+          <input type="text" id="branchName" placeholder="mfano: Kiborloni">
+          <label>Kuratibu za GPS za Ofisi (hiari - unaweza kuiweka baadaye)</label>
+          <input type="text" id="branchMapsLink" placeholder="mfano: -6.792350,39.208330">
+          <label>Namba ya WhatsApp ya Ofisi hii (hiari)</label>
+          <input type="text" id="branchWhatsapp" placeholder="mfano: 255712345678 (bila +)">
+          <label>Masaa ya Kufunguliwa (hiari)</label>
+          <input type="text" id="branchHours" placeholder="mfano: Jumatatu-Jumamosi 9:00am - 8:00pm">
+          <button class="btn" id="branchAddBtn">Ongeza Ofisi</button>
+        </div>
+        <div id="branchList"></div>
+        <p style="color:var(--muted);font-size:12px;margin-top:12px;">
+          Ofisi mpya inaanza ikiwa <b>Imefungwa</b> (haitaonekana kwa wateja) mpaka uifungue (Fungua) hapa.
+          Movie zote lazima ziwe na Ofisi. Ukifungia Ofisi, wateja wa Ofisi hiyo hawataona movie zake.
+        </p>
+      </div>
+      <!-- ADS TAB -->
+      <div class="section" id="tab-ads">
+        <div class="form-box" style="border-color:var(--gold);">
+          <label style="color:var(--gold);">&#127916; Tangazo Maalum la Juu (mfano: "Movies mpya zimetoka")</label>
+          <textarea id="topBannerText" placeholder="mfano: &#128293; Movies mpya za wiki hii zimeshaingia! Angalia sasa."></textarea>
+          <button class="btn" id="topBannerSaveBtn">Hifadhi Maandishi</button>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;">
+            <span style="font-size:13px;">Onyesha kwa Wateja Sasa Hivi:</span>
+            <label class="switch">
+              <input type="checkbox" id="topBannerToggle">
+              <span class="switch-slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="form-box">
+          <label>Tangazo la Picha</label>
+          <input type="file" id="adImage" accept="image/*">
+          <input type="text" id="adImageCaption" placeholder="Maandishi mafupi ya tangazo (hiari)">
+          <button class="btn" id="adImageBtn">Chapisha Tangazo la Picha</button>
+        </div>
+        <div class="form-box">
+          <label>Tangazo la Maandishi</label>
+          <textarea id="adText" placeholder="mfano: Ofa maalum wiki hii! Nunua flash 32GB kwa bei ya..."></textarea>
+          <button class="btn" id="adTextBtn">Chapisha Tangazo la Maandishi</button>
+        </div>
+        <div class="form-box" style="border-color:var(--wait);">
+          <label style="color:var(--wait);">Tangazo la Dharura (linaonekana kwa nyekundu, juu kabisa)</label>
+          <textarea id="adEmergency" placeholder="mfano: Leo Jumatatu ofisi imefungwa kwa sababu za dharura, samahani kwa usumbufu."></textarea>
+          <button class="btn" id="adEmergencyBtn" style="background:var(--wait);color:#fff;">Chapisha Tangazo la Dharura</button>
+        </div>
+        <div class="count" id="adCount"></div>
+        <div id="adList"></div>
+
+        <div class="section-label" style="margin-top:26px;">&#128225; Ads Zinazojitokeza Kiotomatiki (Popup)</div>
+        <div class="form-box" style="border-color:var(--soon);">
+          <label style="color:var(--soon);">Aina ya Popup Ad</label>
+          <select id="popupType">
+            <option value="image">Picha</option>
+            <option value="video">Video (Link ya YouTube)</option>
+          </select>
+          <div id="popupImageField">
+            <label>Chagua Picha</label>
+            <input type="file" id="popupMedia" accept="image/*">
+          </div>
+          <div id="popupVideoField" style="display:none;">
+            <label>Link ya YouTube</label>
+            <input type="text" id="popupYoutubeLink" placeholder="mfano: https://youtube.com/watch?v=ABC123XYZ">
+          </div>
+          <label>Jina/Kichwa cha Tangazo</label>
+          <input type="text" id="popupTitle" placeholder="mfano: FAST & FURIOUS 10 Imeshaingia!">
+          <label>Maelezo Mafupi (hiari)</label>
+          <textarea id="popupDesc" placeholder="mfano: Nenda dukani leo upate nakala yako."></textarea>
+          <button class="btn" id="popupAddBtn" style="background:var(--soon);">Ongeza Popup Ad</button>
+        </div>
+        <div class="form-box">
+          <label>Popup Ads Zionekane Kila Baada ya Muda Gani</label>
+          <select id="popupInterval">
+          <option value="1">Kila dakika 1</option>
+          <option value="2">Kila dakika 2</option>
+          <option value="3">Kila dakika 3</option>
+          <option value="4">Kila dakika 4</option>
+            <option value="5">Kila dakika 5</option>
+            <option value="10">Kila dakika 10</option>
+            <option value="15">Kila dakika 15</option>
+            <option value="20">Kila dakika 20</option>
+            <option value="30">Kila dakika 30</option>
+            <option value="60">Kila saa 1</option>
+              <option value="6000">Kila saa 10</option>
+            <option value="30">Sekunde 30</option>
+            <option value="50">Sekunde 50</option>
+          </select>
+          <label>Ijifunge Yenyewe Baada ya Sekunde Ngapi (kama Mteja Hajabofya X)</label>
+          <select id="popupAutoClose">
+            <option value="8">Sekunde 8</option>
+            <option value="10">Sekunde 10</option>
+            <option value="12">Sekunde 12</option>
+            <option value="15">Sekunde 15</option>
+            <option value="20">Sekunde 20</option>
+            <option value="30">Sekunde 30</option>
+            <option value="40">Sekunde 40</option>
+            <option value="50">Sekunde 50</option>
+            <option value="60">Sekunde 60</option>
+            <option value="1">dakika 1</option>
+            <option value="2">Sekunde 2</option>
+            <option value="0">Isijifunge - Subiri Mpaka Abofye X</option>
+          </select>
+          <button class="btn secondary" id="popupSettingsSaveBtn">Hifadhi Mipangilio</button>
+        </div>
+        <div class="count" id="popupAdCount"></div>
+        <div id="popupAdList"></div>
+      </div>
+      <!-- CHAT TAB -->
+      <div class="section" id="tab-chat">
+        <div id="chatThreadsList"></div>
+        <div id="chatConversation" style="display:none;">
+          <button class="btn small secondary" id="chatBackBtn" style="width:auto;margin-bottom:10px;">&larr; Rudi kwenye Orodha</button>
+          <div id="chatConvName" style="font-weight:bold;margin-bottom:10px;"></div>
+          <div id="chatConvMessages" class="chat-messages" style="height:45vh;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:10px;"></div>
+          <div style="display:flex;gap:8px;">
+            <input type="text" id="chatConvInput" placeholder="Jibu mteja..." style="margin-bottom:0;flex:1;">
+            <button class="btn small" id="chatConvSendBtn" style="width:auto;">Tuma</button>
+          </div>
+        </div>
+      </div>
+      <!-- USERS TAB -->
+      <div class="section" id="tab-users">
+        <div class="count" id="userCount"></div>
+        <div id="userAdminList"></div>
+      </div>
+      <!-- LOTTERY (BAHATI NASIBU) TAB -->
+      <div class="section" id="tab-lottery">
+        <div class="lottery-toggle-box">
+          <div class="lt-label">
+            <b>Sharti la Trailer 5</b>
+            Ukiwasha, mteja lazima atazame trailer 5 leo ndipo aweze kubofya "Jaribu Bahati".
+            Ukizima, kila mtu anaweza kucheza bure bila sharti.
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="lotteryRequireTrailersToggle">
+            <span class="switch-slider"></span>
+          </label>
+        </div>
+        <p style="color:var(--muted);font-size:11px;margin:-10px 0 16px;">
+          &#8505; Mchezo unafunguka kiotomatiki kila Jumatatu saa 6 mchana mpaka saa 10 jioni, na washindi 3
+          wanachaguliwa kwa bahati nasibu wakati dirisha linafungwa &mdash; hii inafanyika hata kama sharti
+          la trailer limezimwa.
+        </p>
+        <div id="lotteryWeekBadge"></div>
+        <div class="section-label">&#127942; Washindi wa Wiki Hii</div>
+        <div id="lotteryAdminWinners"></div>
+        <div class="section-label" style="margin-top:16px;">&#128101; Waliojaribu Bahati Wiki Hii</div>
+        <div class="count" id="lotteryParticipantsCount"></div>
+      </div>
+      <!-- MA-DJ (DJ) TAB -->
+      <div class="section" id="tab-djs">
+        <div class="active-dj-bar">
+          <div>
+            <span class="adb-label">DJ Anayotumika Sasa:</span><br>
+            <span class="adb-name" id="activeDjLabel">Hakuna Aliyechaguliwa</span>
+          </div>
+          <button class="btn small secondary" id="clearActiveDjBtn" style="width:auto;">Ondoa</button>
+        </div>
+        <p style="color:var(--muted);font-size:11px;margin:-10px 0 16px;">
+          &#8505; Chagua DJ hapa chini kwa "Chagua DJ Hii" - movies zote utakazoongeza baada ya hapo
+          zitampatia DJ huyo moja kwa moja. Unaweza kuibadilisha wakati wowote.
+        </p>
+        <div class="form-box">
+          <label>Ongeza DJ Mpya</label>
+          <input type="text" id="djName" placeholder="mfano: DJ OMMY">
+          <label>Picha ya DJ (hiari)</label>
+          <input type="file" id="djImage" accept="image/*">
+          <button class="btn" id="djAddBtn">Ongeza DJ</button>
+        </div>
+        <button class="btn secondary" id="djSeedBtn" style="margin-bottom:16px;">
+          &#127911; Weka Majina ya Awali ya Ma-DJ (mara moja tu)
+        </button>
+        <div class="count" id="djCount"></div>
+        <div id="djList"></div>
+      </div>
+      <div class="section" id="tab-stats">
+        <div class="section-label" style="padding:0 4px;">&#128200; Movies Zinazoangaliwa Trailer Zaidi</div>
+        <div id="statsTrailerList"></div>
+        <div class="section-label" style="padding:12px 4px 0;">&#10084; Movies Zinazopendwa Zaidi</div>
+        <div id="statsLikesList"></div>
+      </div>
+    </main>
+  </div>
+</div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import {
+  getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, setDoc,
+  onSnapshot, query, orderBy, serverTimestamp, where, getDocs, writeBatch
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+// ============================================
+// CONFIG - IMEUNGANISHWA MOJA KWA MOJA (hakuna faili nyingine inayohitajika)
+// ============================================
+const firebaseConfig = {
+  apiKey: "AIzaSyAc9-UB8dja2Bf0PYL72wDI3sOC7eL_02o",
+  authDomain: "reelzone-muvies.firebaseapp.com",
+  projectId: "reelzone-muvies",
+  storageBucket: "reelzone-muvies.firebasestorage.app",
+  messagingSenderId: "930079836592",
+  appId: "1:930079836592:web:25ce8aa2d4d464c3522e75"
+};
+const ADMIN_EMAIL = "mycokavishe@gmail.com";
+const IMGBB_API_KEY = "eabab407ec137007c21922ef7abe9f98";
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+async function compressImage(file, maxWidth = 1000, quality = 0.7) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const reader = new FileReader();
+    reader.onload = (e) => { img.src = e.target.result; };
+    reader.onerror = reject;
+    img.onload = () => {
+      const scale = Math.min(1, maxWidth / img.width);
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      canvas.toBlob((blob) => resolve(blob), 'image/jpeg', quality);
+    };
+    img.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+async function uploadToCloudinary(file) {
+  let toSend = file;
+  try {
+    toSend = await compressImage(file);
+  } catch (e) {
+    toSend = file; // kama compression itashindikana, tuma picha ya awali
+  }
+  const url = `https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`;
+  const formData = new FormData();
+  formData.append('image', toSend);
+  const res = await fetch(url, { method: 'POST', body: formData });
+  const data = await res.json().catch(() => null);
+  if (!res.ok || !data || !data.success) {
+    const detail = data && data.error && data.error.message ? data.error.message : ('HTTP ' + res.status);
+    throw new Error('ImgBB: ' + detail);
+  }
+  return data.data.url;
+}
+let categories = [];
+// ---- AUTH ----
+document.getElementById('loginBtn').addEventListener('click', async () => {
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass = document.getElementById('loginPass').value;
+  const msg = document.getElementById('loginMsg');
+  if (email.toLowerCase() !== ADMIN_EMAIL.toLowerCase()) {
+    msg.textContent = "Barua pepe hii si ya Admin.";
+    return;
+  }
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch (e) {
+    msg.textContent = "Imeshindikana kuingia: " + e.message;
+  }
+});
+document.getElementById('logoutBtn').addEventListener('click', () => signOut(auth));
+onAuthStateChanged(auth, (user) => {
+  if (user && user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    initListeners();
+  } else {
+    document.getElementById('lockScreen').style.display = 'block';
+    document.getElementById('app').style.display = 'none';
+  }
+});
+// ---- TABS ----
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+let listenersInitialized = false;
+function initListeners() {
+  if (listenersInitialized) return;
+  listenersInitialized = true;
+  listenCategories();
+  listenBranches();
+  listenMovies();
+  listenProducts();
+  listenUsers();
+  listenAds();
+  listenChatThreads();
+  listenLottery();
+  listenDjs();
+  listenTopBanner();
+  listenPopupAds();
+}
+// ---- BRANCHES (OFISI) ----
+let branches = [];
+function listenBranches() {
+  const q = query(collection(db, 'branches'), orderBy('name'));
+  onSnapshot(q, (snap) => {
+    branches = [];
+    snap.forEach(d => branches.push({ id: d.id, ...d.data() }));
+    renderBranchSelect();
+    renderBranchList();
+  });
+}
+function renderBranchSelect() {
+  const opts = branches.length
+    ? branches.map(b => `<option value="${b.id}">${escapeHtml(b.name)}</option>`).join('')
+    : '<option value="">-- Ongeza ofisi kwanza --</option>';
+  const sel = document.getElementById('mBranch');
+  if (sel) sel.innerHTML = opts;
+  const bulkSel = document.getElementById('mBulkBranch');
+  if (bulkSel) bulkSel.innerHTML = opts;
+  const pSel = document.getElementById('pBranch');
+  if (pSel) pSel.innerHTML = '<option value="">-- Ofisi Yoyote --</option>' + opts;
+}
+function parseCoords(str) {
+  const s = (str || '').trim();
+  if (!s) return '';
+  const m = s.match(/^(-?\d{1,3}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)$/);
+  if (!m) return null; // format batili
+  const lat = parseFloat(m[1]), lng = parseFloat(m[2]);
+  if (lat < -90 || lat > 90 || lng < -180 || lng > 180) return null;
+  return `${lat},${lng}`;
+}
+function renderBranchList() {
+  const list = document.getElementById('branchList');
+  if (branches.length === 0) {
+    list.innerHTML = '<div class="empty">Bado hakuna ofisi. Ongeza moja juu.</div>';
+    return;
+  }
+  list.innerHTML = branches.map(b => `
+    <div class="card" style="padding:12px 14px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+        <span class="card-title">${escapeHtml(b.name)}</span>
+        <span class="stamp ${b.enabled === true ? 'ipo' : 'bado'}">${b.enabled === true ? 'WAZI' : 'IMEFUNGWA'}</span>
+      </div>
+      <div style="font-size:12px;color:${b.mapsLink ? '#a9c3e8' : 'var(--wait)'};margin-top:6px;">
+        ${b.mapsLink ? '&#128205; Kuratibu: ' + escapeHtml(b.mapsLink) : '&#9888; Kuratibu: Haijawekwa bado'}
+      </div>
+      <div style="font-size:12px;color:${b.whatsapp ? '#a9c3e8' : 'var(--wait)'};margin-top:2px;">
+        ${b.whatsapp ? '&#128241; WhatsApp: Ipo (' + escapeHtml(b.whatsapp) + ')' : '&#9888; WhatsApp: Haijawekwa bado'}
+      </div>
+      <div style="font-size:12px;color:${b.hours ? '#a9c3e8' : 'var(--muted)'};margin-top:2px;">
+        ${b.hours ? '&#128337; ' + escapeHtml(b.hours) : '&#128337; Masaa: Haijawekwa'}
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;">
+        <span class="toggle-mini" onclick="toggleBranch('${b.id}', ${b.enabled !== true})">
+          ${b.enabled !== true ? 'Fungua' : 'Funga'}
+        </span>
+        <span class="toggle-mini" onclick="setBranchMapsLink('${b.id}')">${b.mapsLink ? 'Badilisha Kuratibu' : 'Weka Kuratibu'}</span>
+        <span class="toggle-mini" onclick="setBranchWhatsapp('${b.id}')">${b.whatsapp ? 'Badilisha WhatsApp' : 'Weka WhatsApp'}</span>
+        <span class="toggle-mini" onclick="setBranchHours('${b.id}')">${b.hours ? 'Badilisha Masaa' : 'Weka Masaa'}</span>
+        <span class="toggle-mini" style="border-color:var(--wait);color:var(--wait);" onclick="deleteBranch('${b.id}')">Futa</span>
+      </div>
+    </div>
+  `).join('');
+}
+document.getElementById('branchAddBtn').addEventListener('click', async () => {
+  const nameEl = document.getElementById('branchName');
+  const linkEl = document.getElementById('branchMapsLink');
+  const waEl = document.getElementById('branchWhatsapp');
+  const hoursEl = document.getElementById('branchHours');
+  const name = nameEl.value.trim();
+  const rawCoords = linkEl.value.trim();
+  const whatsapp = waEl.value.trim().replace(/[^0-9]/g, '');
+  const hours = hoursEl.value.trim();
+  if (!name) return;
+  const exists = branches.some(b => b.name.trim().toLowerCase() === name.toLowerCase());
+  if (exists) {
+    alert('Ofisi yenye jina hili tayari ipo.');
+    return;
+  }
+  let mapsLink = '';
+  if (rawCoords) {
+    const parsed = parseCoords(rawCoords);
+    if (parsed === null) {
+      alert('Kuratibu si sahihi. Mfano sahihi: -6.792350,39.208330 (namba mbili zikitenganishwa na comma)');
+      return;
+    }
+    mapsLink = parsed;
+  }
+  await addDoc(collection(db, 'branches'), { name, enabled: false, mapsLink, whatsapp, hours, createdAt: serverTimestamp() });
+  nameEl.value = '';
+  linkEl.value = '';
+  waEl.value = '';
+  hoursEl.value = '';
+  alert('Ofisi "' + name + '" imeongezwa. Ikumbuke kuwa bado imefungwa - "Fungua" ili wateja waione.');
+});
+window.setBranchHours = async (id) => {
+  const b = branches.find(x => x.id === id);
+  const hours = prompt('Weka masaa ya kufunguliwa ya ofisi hii (mfano: Jumatatu-Jumamosi 9:00am - 8:00pm):', (b && b.hours) || '');
+  if (hours === null) return;
+  await updateDoc(doc(db, 'branches', id), { hours: hours.trim() });
+};
+window.setBranchWhatsapp = async (id) => {
+  const b = branches.find(x => x.id === id);
+  const num = prompt('Weka namba ya WhatsApp ya ofisi hii (mfano 255712345678, bila +):', (b && b.whatsapp) || '');
+  if (num === null) return;
+  await updateDoc(doc(db, 'branches', id), { whatsapp: num.trim().replace(/[^0-9]/g, '') });
+};
+window.setBranchMapsLink = async (id) => {
+  const b = branches.find(x => x.id === id);
+  const input = prompt('Weka kuratibu za GPS za ofisi hii (mfano: -6.792350,39.208330)\n\nJinsi ya kuzipata: fungua Google Maps, bonyeza-shikilia mahali halisi pa ofisi, kuratibu zitaonekana chini - bonyeza kuzinakili.', (b && b.mapsLink) || '');
+  if (input === null) return;
+  if (input.trim() === '') {
+    await updateDoc(doc(db, 'branches', id), { mapsLink: '' });
+    return;
+  }
+  const parsed = parseCoords(input);
+  if (parsed === null) {
+    alert('Kuratibu si sahihi. Mfano sahihi: -6.792350,39.208330 (namba mbili zikitenganishwa na comma, si link)');
+    return;
+  }
+  await updateDoc(doc(db, 'branches', id), { mapsLink: parsed });
+};
+window.toggleBranch = async (id, enable) => {
+  await updateDoc(doc(db, 'branches', id), { enabled: enable });
+};
+window.deleteBranch = async (id) => {
+  if (!confirm('Futa ofisi hii? Movie zilizopo ndani yake hazitafutwa lakini hazitaonekana.')) return;
+  await deleteDoc(doc(db, 'branches', id));
+};
+function branchName(id) {
+  const b = branches.find(x => x.id === id);
+  return b ? b.name : 'Bila Ofisi';
+}
+// ---- CATEGORIES ----
+function listenCategories() {
+  const q = query(collection(db, 'categories'), orderBy('name'));
+  onSnapshot(q, (snap) => {
+    categories = [];
+    snap.forEach(d => categories.push({ id: d.id, ...d.data() }));
+    renderCategorySelect();
+    renderCategoryList();
+  });
+}
+function renderCategorySelect() {
+  const sel = document.getElementById('mCategory');
+  sel.innerHTML = categories.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+  const bulkSel = document.getElementById('mBulkCategory');
+  if (bulkSel) bulkSel.innerHTML = categories.map(c => `<option value="${c.id}">${escapeHtml(c.name)}</option>`).join('');
+}
+function renderCategoryList() {
+  const list = document.getElementById('catList');
+  if (categories.length === 0) {
+    list.innerHTML = '<div class="empty">Bado hakuna category. Ongeza moja juu.</div>';
+    return;
+  }
+  list.innerHTML = categories.map(c => `
+    <span class="cat-pill ${c.enabled === false ? 'disabled' : ''}">
+      ${escapeHtml(c.name)}
+      <span class="toggle-mini" onclick="toggleCategory('${c.id}', ${c.enabled === false})">
+        ${c.enabled === false ? 'Fungua' : 'Funga'}
+      </span>
+      <span class="toggle-mini" style="border-color:var(--wait);color:var(--wait);" onclick="deleteCategory('${c.id}')">Futa</span>
+    </span>
+  `).join('');
+}
+document.getElementById('catAddBtn').addEventListener('click', async () => {
+  const nameEl = document.getElementById('catName');
+  const name = nameEl.value.trim();
+  if (!name) return;
+  const exists = categories.some(c => c.name.trim().toLowerCase() === name.toLowerCase());
+  if (exists) {
+    alert('Category yenye jina hili tayari ipo.');
+    return;
+  }
+  await addDoc(collection(db, 'categories'), { name, enabled: true, createdAt: serverTimestamp() });
+  nameEl.value = '';
+});
+window.toggleCategory = async (id, enable) => {
+  await updateDoc(doc(db, 'categories', id), { enabled: enable });
+};
+window.deleteCategory = async (id) => {
+  if (!confirm('Futa category hii? Movie zilizopo ndani yake hazitafutwa lakini hazitaonekana.')) return;
+  await deleteDoc(doc(db, 'categories', id));
+};
+// ---- MOVIES ----
+let latestMovies = [];
+let selectedMovieIds = new Set();
+let openAdminComments = {};
+let adminCommentUnsub = {};
+function listenMovies() {
+  const q = query(collection(db, 'movies'), orderBy('createdAt', 'desc'));
+  onSnapshot(q, (snap) => {
+    latestMovies = [];
+    snap.forEach(d => latestMovies.push({ id: d.id, ...d.data() }));
+    applyMovieSearchFilter();
+    renderStats();
+  });
+}
+function renderStats() {
+  const trailerBox = document.getElementById('statsTrailerList');
+  const likesBox = document.getElementById('statsLikesList');
+  if (!trailerBox || !likesBox) return;
+  const byTrailer = [...latestMovies].filter(m => (m.trailerClicks || 0) > 0)
+    .sort((a, b) => (b.trailerClicks || 0) - (a.trailerClicks || 0)).slice(0, 10);
+  const byLikes = [...latestMovies].filter(m => (m.likes || 0) > 0)
+    .sort((a, b) => (b.likes || 0) - (a.likes || 0)).slice(0, 10);
+  trailerBox.innerHTML = byTrailer.length === 0
+    ? '<div class="empty">Bado hakuna mtu aliyeangalia trailer yoyote.</div>'
+    : byTrailer.map((m, i) => `
+        <div class="card" style="padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+          <span class="card-title" style="font-size:14px;">${i + 1}. ${escapeHtml(m.title)}</span>
+          <span class="stamp ipo">${m.trailerClicks} mara</span>
+        </div>`).join('');
+  likesBox.innerHTML = byLikes.length === 0
+    ? '<div class="empty">Bado hakuna movie iliyopendwa.</div>'
+    : byLikes.map((m, i) => `
+        <div class="card" style="padding:10px 14px;display:flex;justify-content:space-between;align-items:center;">
+          <span class="card-title" style="font-size:14px;">${i + 1}. ${escapeHtml(m.title)}</span>
+          <span class="stamp ipo">&#10084; ${m.likes}</span>
+        </div>`).join('');
+}
+function applyMovieSearchFilter() {
+  const term = (document.getElementById('movieSearchInput').value || '').trim().toLowerCase();
+  if (!term) { renderMovies(latestMovies); return; }
+  const filtered = latestMovies.filter(m => (m.title || '').toLowerCase().includes(term));
+  renderMovies(filtered);
+}
+document.getElementById('movieSearchInput').addEventListener('input', applyMovieSearchFilter);
+function catName(id) {
+  const c = categories.find(x => x.id === id);
+  return c ? c.name : 'Bila Category';
+}
+function statusLabel(s) {
+  if (s === 'ipo') return { text: 'IPO', cls: 'ipo' };
+  if (s === 'bado') return { text: 'BADO', cls: 'bado' };
+  return { text: 'INAKUJA', cls: 'inakuja' };
+}
+function renderMovies(movies) {
+  document.getElementById('movieCount').textContent = movies.length + ' MOVIE KWENYE MFUMO';
+  const list = document.getElementById('movieList');
+  if (movies.length === 0) {
+    list.innerHTML = '<div class="empty">Bado hujaongeza movie yoyote.</div>';
+    return;
+  }
+  list.innerHTML = movies.map(m => {
+    const s = statusLabel(m.status);
+    return `<div class="card">
+      ${m.imageUrl ? `<img class="thumb" src="${m.imageUrl}">` : ''}
+      <div class="card-top">
+        <div class="card-top-row">
+          <input type="checkbox" class="movie-select" data-id="${m.id}" ${selectedMovieIds.has(m.id) ? 'checked' : ''} onchange="toggleMovieSelect('${m.id}', this.checked)">
+          <div class="card-title-wrap">
+            <div class="card-title">${escapeHtml(m.title)}</div>
+            <div class="card-meta">${escapeHtml(catName(m.category))} &middot; ${escapeHtml(branchName(m.branch))} &middot; ${m.likes || 0} likes ${m.trailerId ? '&middot; \ud83c\udfa5 Trailer ipo' : ''} ${m.djId ? '&middot; \ud83c\udfa7 ' + escapeHtml(djName(m.djId)) : ''}</div>
+          </div>
+        </div>
+        <span class="stamp ${s.cls}">${s.text}</span>
+      </div>
+      ${m.description ? `<div class="card-desc">${escapeHtml(m.description)}</div>` : ''}
+      <div class="card-actions">
+        <select class="btn small secondary" style="width:auto;" onchange="updateMovieStatus('${m.id}', this.value)">
+          <option value="ipo" ${m.status === 'ipo' ? 'selected' : ''}>Ipo</option>
+          <option value="inakuja" ${m.status === 'inakuja' ? 'selected' : ''}>Inakuja</option>
+          <option value="bado" ${m.status === 'bado' ? 'selected' : ''}>Bado</option>
+        </select>
+        <select class="btn small secondary" style="width:auto;" onchange="updateMovieCategory('${m.id}', this.value)">
+          ${categories.map(c => `<option value="${c.id}" ${m.category === c.id ? 'selected' : ''}>${escapeHtml(c.name)}</option>`).join('')}
+        </select>
+        <select class="btn small secondary" style="width:auto;" onchange="updateMovieBranch('${m.id}', this.value)">
+          ${branches.map(b => `<option value="${b.id}" ${m.branch === b.id ? 'selected' : ''}>${escapeHtml(b.name)}</option>`).join('')}
+        </select>
+        <select class="btn small secondary" style="width:auto;" onchange="updateMovieDj('${m.id}', this.value)">
+          <option value="">-- Hakuna DJ --</option>
+          ${djs.map(dj => `<option value="${dj.id}" ${m.djId === dj.id ? 'selected' : ''}>${escapeHtml(dj.name)}</option>`).join('')}
+        </select>
+        <button class="btn small secondary" onclick="openEditMovie('${m.id}')">Hariri</button>
+        <button class="btn small danger" onclick="deleteMovie('${m.id}')">Futa</button>
+      </div>
+      <div id="editBox-${m.id}" style="display:${openEditIds[m.id] ? 'block' : 'none'};margin-top:10px;border-top:1px solid var(--rule);padding-top:10px;">
+        <label>Jina la Movie</label>
+        <input type="text" id="editTitle-${m.id}" value="${escapeHtml(m.title)}">
+        <label>Maelezo</label>
+        <textarea id="editDesc-${m.id}">${escapeHtml(m.description || '')}</textarea>
+        <label>Picha Mpya (hiari - ukiacha wazi picha ya zamani inabaki; kama movie haina picha kabisa na kuna Trailer, tutatumia thumbnail ya YouTube kiotomatiki)</label>
+        <input type="file" id="editImage-${m.id}" accept="image/*">
+        <label>Link ya Trailer (YouTube - Unlisted)</label>
+        <input type="text" id="editTrailer-${m.id}" value="${m.trailerId ? 'https://youtu.be/' + m.trailerId : ''}" placeholder="mfano: https://youtube.com/watch?v=ABC123XYZ">
+        <button class="btn small" onclick="saveEditMovie('${m.id}')">Hifadhi Mabadiliko</button>
+        <button class="btn small secondary" onclick="openEditMovie('${m.id}')">Ghairi</button>
+      </div>
+      ${renderAdminCommentsBlock(m.id)}
+    </div>`;
+  }).join('');
+  updateBulkBar();
+}
+function updateBulkBar() {
+  const validIds = new Set(latestMovies.map(m => m.id));
+  for (const id of Array.from(selectedMovieIds)) {
+    if (!validIds.has(id)) selectedMovieIds.delete(id);
+  }
+  const btn = document.getElementById('deleteSelectedBtn');
+  if (btn) {
+    btn.textContent = `Futa Zilizochaguliwa (${selectedMovieIds.size})`;
+    btn.disabled = selectedMovieIds.size === 0;
+  }
+  const selAll = document.getElementById('movieSelectAll');
+  if (selAll) selAll.checked = latestMovies.length > 0 && selectedMovieIds.size === latestMovies.length;
+}
+window.toggleMovieSelect = (id, checked) => {
+  if (checked) selectedMovieIds.add(id);
+  else selectedMovieIds.delete(id);
+  updateBulkBar();
+};
+document.getElementById('movieSelectAll').addEventListener('change', (e) => {
+  const term = (document.getElementById('movieSearchInput').value || '').trim().toLowerCase();
+  const visible = term ? latestMovies.filter(m => (m.title || '').toLowerCase().includes(term)) : latestMovies;
+  if (e.target.checked) visible.forEach(m => selectedMovieIds.add(m.id));
+  else visible.forEach(m => selectedMovieIds.delete(m.id));
+  applyMovieSearchFilter();
+});
+document.getElementById('deleteSelectedBtn').addEventListener('click', async () => {
+  if (selectedMovieIds.size === 0) return;
+  const titles = latestMovies.filter(m => selectedMovieIds.has(m.id)).map(m => m.title);
+  if (!confirm(`Futa movie ${selectedMovieIds.size} zilizochaguliwa?\n\n${titles.join(', ')}`)) return;
+  const btn = document.getElementById('deleteSelectedBtn');
+  btn.disabled = true;
+  btn.textContent = 'Inafuta...';
+  try {
+    for (const id of Array.from(selectedMovieIds)) {
+      await deleteDoc(doc(db, 'movies', id));
+    }
+    selectedMovieIds.clear();
+  } catch (e) {
+    alert('Imeshindwa kufuta baadhi: ' + e.message);
+  }
+  updateBulkBar();
+});
+document.getElementById('deleteAllMoviesBtn').addEventListener('click', async () => {
+  if (latestMovies.length === 0) return alert('Hakuna movie kwenye mfumo.');
+  if (!confirm(`Una uhakika unataka kufuta MOVIE ZOTE (${latestMovies.length})? Hatua hii haiwezi kurudishwa.`)) return;
+  if (!confirm('Uthibitisho wa mwisho: Futa movie zote kabisa?')) return;
+  const btn = document.getElementById('deleteAllMoviesBtn');
+  btn.disabled = true;
+  btn.textContent = 'Inafuta Zote...';
+  try {
+    for (const m of latestMovies) {
+      await deleteDoc(doc(db, 'movies', m.id));
+    }
+    selectedMovieIds.clear();
+  } catch (e) {
+    alert('Imeshindwa kufuta baadhi: ' + e.message);
+  }
+  btn.disabled = false;
+  btn.textContent = 'Futa Movie ZOTE';
+});
+async function runEpisodeCleanup(movieList, btn) {
+  if (movieList.length === 0) return alert('Hakuna movie za kuchunguza.');
+  const groups = {};
+  const order = [];
+  movieList.forEach(m => {
+    const info = extractEpisodeInfo(m.title);
+    if (!info) return;
+    const key = normalizeBase(info.base);
+    if (!groups[key]) { groups[key] = { base: info.base, items: [] }; order.push(key); }
+    groups[key].items.push({ id: m.id, title: m.title, ep: info.ep });
+  });
+  const toDelete = [];
+  const summary = [];
+  order.forEach(key => {
+    const g = groups[key];
+    g.items.sort((a, b) => a.ep - b.ep);
+    if (g.items.length > 2) {
+      const middle = g.items.slice(1, -1);
+      middle.forEach(it => toDelete.push(it));
+      summary.push(`- ${g.base}: kubaki Ep ${g.items[0].ep} na Ep ${g.items[g.items.length - 1].ep}, kufuta episode ${middle.length} za katikati`);
+    }
+  });
+  if (toDelete.length === 0) return alert('Hakuna series yenye episode za katikati za kufuta kwenye orodha hii. Kila kitu tayari kiko sawa.');
+  if (!confirm(`Series zifuatazo zitasafishwa (episode za kati-kati zitafutwa, ya kwanza na ya mwisho zitabaki):\n\n${summary.join('\n')}\n\nJumla ya movie ${toDelete.length} zitafutwa. Endelea?`)) return;
+  const original = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Inasafisha...';
+  try {
+    for (const it of toDelete) {
+      await deleteDoc(doc(db, 'movies', it.id));
+      selectedMovieIds.delete(it.id);
+    }
+    alert(`Imekamilika. Episode ${toDelete.length} za katikati zimefutwa.`);
+  } catch (e) {
+    alert('Imeshindwa kusafisha baadhi: ' + e.message);
+  }
+  btn.disabled = false;
+  btn.textContent = original;
+}
+document.getElementById('cleanupEpisodesBtn').addEventListener('click', () => {
+  runEpisodeCleanup(latestMovies, document.getElementById('cleanupEpisodesBtn'));
+});
+document.getElementById('cleanupRecentBtn').addEventListener('click', () => {
+  const hours = parseFloat(document.getElementById('cleanupHoursWindow').value) || 24;
+  const cutoff = Date.now() - hours * 60 * 60 * 1000;
+  const recent = latestMovies.filter(m => {
+    const t = m.createdAt && typeof m.createdAt.toMillis === 'function' ? m.createdAt.toMillis() : null;
+    return t !== null && t >= cutoff;
+  });
+  if (recent.length === 0) return alert(`Hakuna movie zilizowekwa ndani ya masaa ${hours} yaliyopita.`);
+  runEpisodeCleanup(recent, document.getElementById('cleanupRecentBtn'));
+});
+function renderAdminCommentsBlock(movieId) {
+  const isOpen = !!openAdminComments[movieId];
+  const comments = openAdminComments[movieId] || [];
+  return `
+    <button class="comments-admin-toggle" onclick="toggleAdminComments('${movieId}')">${isOpen ? 'Ficha Maoni' : 'Ona Maoni ya Wateja'}</button>
+    <div class="comments-admin-section ${isOpen ? 'open' : ''}">
+      ${comments.length === 0 ? '<div style="color:var(--muted);font-size:12px;">Bado hakuna maoni.</div>' : ''}
+      ${comments.map(c => `
+        <div class="comment-admin-item ${c.isAdmin ? 'admin-reply' : ''}">
+          <div>
+            <span class="c-author">${c.isAdmin ? '\u2605 Wewe (Admin)' : escapeHtml(c.userName || 'Mteja')}</span>
+            <div>${escapeHtml(c.text)}</div>
+          </div>
+          <button class="icon-btn del" onclick="deleteComment('${movieId}', '${c.id}')">\u2715</button>
+        </div>
+      `).join('')}
+      <div class="comment-reply-row">
+        <input type="text" id="adminReplyInput-${movieId}" placeholder="Jibu kama Admin...">
+        <button class="btn small" onclick="submitAdminReply('${movieId}')">Tuma</button>
+      </div>
+    </div>
+  `;
+}
+window.toggleAdminComments = (movieId) => {
+  if (openAdminComments[movieId]) {
+    delete openAdminComments[movieId];
+    if (adminCommentUnsub[movieId]) { adminCommentUnsub[movieId](); delete adminCommentUnsub[movieId]; }
+    renderMovies(latestMovies);
+    return;
+  }
+  openAdminComments[movieId] = [];
+  const q = query(collection(db, 'movies', movieId, 'comments'), orderBy('createdAt', 'asc'));
+  adminCommentUnsub[movieId] = onSnapshot(q, (snap) => {
+    const arr = [];
+    snap.forEach(d => arr.push({ id: d.id, ...d.data() }));
+    openAdminComments[movieId] = arr;
+    renderMovies(latestMovies);
+  });
+  renderMovies(latestMovies);
+};
+window.submitAdminReply = async (movieId) => {
+  const input = document.getElementById('adminReplyInput-' + movieId);
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  await addDoc(collection(db, 'movies', movieId, 'comments'), {
+    text, uid: auth.currentUser.uid, userName: 'Reelzone', isAdmin: true, createdAt: serverTimestamp()
+  });
+};
+window.deleteComment = async (movieId, commentId) => {
+  if (!confirm('Futa maoni haya?')) return;
+  await deleteDoc(doc(db, 'movies', movieId, 'comments', commentId));
+};
+window.updateMovieCategory = async (id, category) => {
+  await updateDoc(doc(db, 'movies', id), { category });
+};
+window.updateMovieBranch = async (id, branch) => {
+  await updateDoc(doc(db, 'movies', id), { branch });
+};
+window.updateMovieDj = async (id, djId) => {
+  await updateDoc(doc(db, 'movies', id), { djId: djId || null });
+};
+let openEditIds = {};
+window.openEditMovie = (id) => {
+  openEditIds[id] = !openEditIds[id];
+  const box = document.getElementById('editBox-' + id);
+  if (box) box.style.display = openEditIds[id] ? 'block' : 'none';
+};
+window.saveEditMovie = async (id) => {
+  const title = document.getElementById('editTitle-' + id).value.trim();
+  const description = document.getElementById('editDesc-' + id).value.trim();
+  const imageFile = document.getElementById('editImage-' + id).files[0];
+  const trailerInput = document.getElementById('editTrailer-' + id).value.trim();
+  if (!title) return alert('Jina la movie haliwezi kuwa tupu.');
+  const trailerId = extractYouTubeId(trailerInput);
+  if (trailerInput && !trailerId) {
+    return alert('Link ya YouTube haieleweki. Hakikisha umebandika link kamili kutoka YouTube.');
+  }
+  const updates = { title, description, trailerId: trailerId || '' };
+  if (imageFile) {
+    try {
+      updates.imageUrl = await uploadToCloudinary(imageFile);
+    } catch (e) {
+      return alert('Imeshindwa kupakia picha: ' + e.message);
+    }
+  } else if (trailerId) {
+    // Hakuna picha mpya iliyopakiwa - ikiwa movie haina picha bado, tumia thumbnail ya YouTube kiotomatiki
+    const existing = latestMovies.find(m => m.id === id);
+    if (!existing || !existing.imageUrl) {
+      updates.imageUrl = `https://img.youtube.com/vi/${trailerId}/hqdefault.jpg`;
+    }
+  }
+  try {
+    await updateDoc(doc(db, 'movies', id), updates);
+  } catch (e) {
+    return alert('Imeshindwa kuhifadhi: ' + e.message);
+  }
+  openEditIds[id] = false;
+  alert('Mabadiliko yamehifadhiwa.');
+};
+// ---- EPISODE RANGE REDUCTION (series zenye episode nyingi -> chukua ya kwanza na ya mwisho) ----
+// Husafisha alama za ubora (720p, 1080p, HD n.k) mwishoni mwa jina kabla ya kutafuta namba ya episode.
+function stripQualityTags(title) {
+  let t = title.trim();
+  let prev;
+  do {
+    prev = t;
+    t = t.replace(/[\(\[]\s*(?:720p|1080p|480p|360p|240p|hd|sd|4k|full\s*hd)\s*[\)\]]\s*$/i, '').trim();
+    t = t.replace(/[\s\-_]*(?:720p|1080p|480p|360p|240p|hd|sd|4k)\s*$/i, '').trim();
+    // Ondoa hashtags za mwisho (#babajoan #asmafamily n.k) zilizowekwa baada ya namba ya episode
+    t = t.replace(/(?:\s*#[^\s#]+)+\s*$/, '').trim();
+  } while (t !== prev && t.length > 0);
+  return t || title.trim();
+}
+// Hulinganisha majina yenye "_" na yenye nafasi kama ni series moja (mfano BAD_BOY == BAD BOY).
+function normalizeBase(base) {
+  return base.replace(/[_\-]+/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
+}
+function extractEpisodeInfo(title) {
+  const t = stripQualityTags(title);
+  const NOISE = '(?:full|official|new|latest)[\\s_]+'; // maneno ya ziada kabla ya "Episode" kama "Full Episode"
+  // 0) Muundo wa ngazi-mbili: "... Ep 69 Part 1" (huhesabu mfululizo sahihi kwa kuunganisha namba zote mbili)
+  const dblRe = new RegExp('^(.*?)[\\s\\-\\u2013_:]+(?:' + NOISE + ')?(?:episode|ep\\.?|sehemu(?:[\\s_]+ya)?|kipande)[\\s._:\\-\\[\\]]*([0-9]+)[\\s\\-\\u2013_:]+(?:' + NOISE + ')?(?:part|pat|sehemu(?:[\\s_]+ya)?|kipande)[\\s._:\\-\\[\\]]*([0-9]+)[\\s\\-_#.\\]]*$', 'i');
+  let m = t.match(dblRe);
+  if (m) {
+    const base = m[1].trim();
+    const ep1 = parseInt(m[2], 10);
+    const ep2 = parseInt(m[3], 10);
+    if (base && !isNaN(ep1) && !isNaN(ep2)) return { base, ep: ep1 * 1000 + ep2 };
+  }
+  // 1) Neno maalum: Episode, Ep, Sehemu, Kipande, Pat, Part - popote lilipo (si lazima liwe mwishoni;
+  //    maandishi ya ziada baada ya namba - kama maelezo au hashtag - yanapuuzwa moja kwa moja)
+  const kwRe = new RegExp('^(.*?)[\\s\\-\\u2013_:]+(?:' + NOISE + ')?(?:episode|ep\\.?|sehemu(?:[\\s_]+ya)?|pat|part|kipande)[\\s._:\\-\\[\\]]*([0-9]+)', 'i');
+  m = t.match(kwRe);
+  if (m) {
+    const base = m[1].trim();
+    const ep = parseInt(m[2], 10);
+    if (base && !isNaN(ep)) return { base, ep };
+  }
+  // 2) Kama hakuna neno la episode, jaribu namba tupu mwishoni (mfano "BAD BOY 52", "AFUKULIWE - 05 -")
+  const bareRe = /^(.*?)[\s\-\u2013_:]+([0-9]+)[\s\-_#.]*$/;
+  m = t.match(bareRe);
+  if (m) {
+    const base = m[1].trim();
+    const ep = parseInt(m[2], 10);
+    if (base && base.length >= 2 && !isNaN(ep)) return { base, ep };
+  }
+  return null;
+}
+function reduceEpisodeRanges(titles) {
+  const groups = {};
+  const order = [];
+  const parsedList = titles.map(t => ({ raw: t, info: extractEpisodeInfo(t) }));
+  parsedList.forEach(item => {
+    if (item.info) {
+      const key = normalizeBase(item.info.base);
+      if (!groups[key]) { groups[key] = { base: item.info.base, items: [] }; order.push(key); }
+      groups[key].items.push({ raw: item.raw, ep: item.info.ep });
+    }
+  });
+  const droppedInfo = [];
+  const keepSet = new Set();
+  order.forEach(key => {
+    const g = groups[key];
+    g.items.sort((a, b) => a.ep - b.ep);
+    if (g.items.length <= 2) {
+      g.items.forEach(it => keepSet.add(it.raw));
+    } else {
+      keepSet.add(g.items[0].raw);
+      keepSet.add(g.items[g.items.length - 1].raw);
+      droppedInfo.push({ base: g.base, from: g.items[0].ep, to: g.items[g.items.length - 1].ep, middleCount: g.items.length - 2 });
+    }
+  });
+  const kept = [];
+  parsedList.forEach(item => {
+    if (!item.info || keepSet.has(item.raw)) kept.push(item.raw);
+  });
+  return { kept, droppedInfo };
+}
+// ---- DUPLICATE DETECTION (dhidi ya movies zilizopo + ndani ya orodha yenyewe) ----
+function dedupeTitles(titles, existingTitlesLower) {
+  const seen = new Set();
+  const finalList = [];
+  const duplicates = [];
+  titles.forEach(t => {
+    const key = t.trim().toLowerCase();
+    if (existingTitlesLower.has(key) || seen.has(key)) {
+      duplicates.push(t);
+    } else {
+      seen.add(key);
+      finalList.push(t);
+    }
+  });
+  return { finalList, duplicates };
+}
+document.getElementById('mBulkAddBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('mBulkAddBtn');
+  const raw = document.getElementById('mBulkTitles').value;
+  const category = document.getElementById('mBulkCategory').value;
+  const branch = document.getElementById('mBulkBranch').value;
+  const rawTitles = raw.split('\n').map(t => t.trim()).filter(t => t.length > 0);
+  if (rawTitles.length === 0) return alert('Bandika angalau jina moja la movie.');
+  if (!branch) return alert('Chagua Ofisi kwanza (nenda tab "Ofisi" kama bado hujaongeza).');
+
+  // 1. Punguza series zenye episode nyingi (chukua ya kwanza na ya mwisho tu)
+  const { kept, droppedInfo } = reduceEpisodeRanges(rawTitles);
+
+  // 2. Ondoa majina yaliyorudiwa (dhidi ya zilizopo tayari + ndani ya orodha hii)
+  const existingTitlesLower = new Set(latestMovies.map(m => m.title.trim().toLowerCase()));
+  const { finalList, duplicates } = dedupeTitles(kept, existingTitlesLower);
+
+  if (finalList.length === 0) {
+    let msg = 'Hakuna movie mpya ya kuongeza.';
+    if (duplicates.length) msg += `\n\nZote zilizopo tayari (zimerukwa): ${duplicates.join(', ')}`;
+    return alert(msg);
+  }
+
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = `Inaongeza ${finalList.length}...`;
+  let djAssignedCount = 0;
+  try {
+    for (const title of finalList) {
+      const djId = bulkDjAssignments[title.trim().toLowerCase()] || activeDjId || null;
+      if (djId) djAssignedCount++;
+      await addDoc(collection(db, 'movies'), {
+        title, category, branch, status: 'ipo', description: '', imageUrl: '', trailerId: '', djId,
+        likes: 0, createdAt: serverTimestamp()
+      });
+    }
+    document.getElementById('mBulkTitles').value = '';
+    bulkDjAssignments = {};
+    djMissingQueue = {};
+    renderDjMissingBox();
+    const djLog = document.getElementById('djDetectLog');
+    if (djLog) { djLog.style.display = 'none'; djLog.innerHTML = ''; }
+    let summary = `Movie ${finalList.length} zimeongezwa.`;
+    if (djAssignedCount > 0) summary += `\n\nMovie ${djAssignedCount} zimepangiwa DJ.`;
+    if (droppedInfo.length) {
+      summary += `\n\nSeries zilizopunguzwa (episode za katikati zimeachwa):\n` +
+        droppedInfo.map(d => `- ${d.base}: kutoka Ep ${d.from} mpaka Ep ${d.to} (episode ${d.middleCount} za katikati zimeachwa)`).join('\n');
+    }
+    if (duplicates.length) {
+      summary += `\n\nMajina yaliyorudiwa (yamerukwa kwa sababu tayari yapo): ${duplicates.join(', ')}`;
+    }
+    summary += `\n\nSasa unaweza kuhariri kila moja (kuongeza picha/trailer) kwenye orodha chini.`;
+    alert(summary);
+  } catch (e) {
+    alert('Imeshindwa: ' + e.message);
+  }
+  btn.disabled = false;
+  btn.textContent = originalText;
+});
+// ---- UTAMBUZI WA MA-DJ KIOTOMATIKI (AI) KWENYE BULK TITLES ----
+let bulkDjAssignments = {}; // titleLower -> djId
+let djMissingQueue = {}; // nameLower -> { name, titles: [] }
+function logDjDetect(msg, cls) {
+  const log = document.getElementById('djDetectLog');
+  if (!log) return;
+  log.style.display = 'block';
+  const line = document.createElement('div');
+  if (cls) line.className = cls;
+  line.textContent = msg;
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+}
+function renderDjMissingBox() {
+  const box = document.getElementById('djMissingBox');
+  if (!box) return;
+  const keys = Object.keys(djMissingQueue);
+  if (keys.length === 0) { box.innerHTML = ''; return; }
+  box.innerHTML = `<p style="color:var(--wait);font-size:12px;margin:10px 0 4px;">Ma-DJ wapya wafuatao wamegunduliwa kwenye majina lakini hawapo kwenye mfumo bado:</p>` +
+    keys.map(k => {
+      const g = djMissingQueue[k];
+      return `<div class="missing-cat-row">
+        <span>"${escapeHtml(g.name)}" &mdash; movie ${g.titles.length}: ${escapeHtml(g.titles.slice(0, 3).join(', '))}${g.titles.length > 3 ? '...' : ''}</span>
+        <button class="btn small" onclick="addMissingDj('${k.replace(/'/g, "\\'")}')">Ongeza DJ</button>
+      </div>`;
+    }).join('');
+}
+async function ensureDj(name) {
+  const existing = djs.find(d => d.name.trim().toLowerCase() === name.trim().toLowerCase());
+  if (existing) return existing.id;
+  const ref = await addDoc(collection(db, 'djs'), { name: name.trim(), photoUrl: '', createdAt: serverTimestamp() });
+  return ref.id;
+}
+window.addMissingDj = async (key) => {
+  const g = djMissingQueue[key];
+  if (!g) return;
+  try {
+    const djId = await ensureDj(g.name);
+    if (!djs.find(d => d.id === djId)) djs.push({ id: djId, name: g.name, photoUrl: '' });
+    for (const title of g.titles) {
+      bulkDjAssignments[title.trim().toLowerCase()] = djId;
+    }
+    logDjDetect(`\u2713 DJ "${g.name}" imeongezwa na kupangiwa movie ${g.titles.length}.`, 'ok');
+    delete djMissingQueue[key];
+    renderDjMissingBox();
+  } catch (e) {
+    alert('Imeshindwa kuongeza DJ: ' + e.message);
+  }
+};
+function buildDjDetectPrompt(chunk, djNames) {
+  const listText = chunk.map((t, i) => `${i + 1}. ${t}`).join('\n');
+  return `Wewe ni mtaalamu wa kutambua majina ya "DJ" (mtangazaji aliyetafsiri/kutamka movie) yaliyoandikwa ndani ya majina ya movie/episode za Kibongo (Kiswahili).
+
+Majina ya DJ mara nyingi huandikwa ndani ya jina la movie kwa njia mbalimbali, mfano:
+- "Main Hoon Na babudj" -> DJ ni "Babu Dj"
+- "Lunah Ep 12 Babu Dj 0758844763" -> DJ ni "Babu Dj" (namba za simu mwishoni SIO sehemu ya jina la DJ, ziache kabisa)
+- "Fast X Ep 3 DJ Ommy" -> DJ ni "DJ Ommy"
+
+KANUNI MUHIMU:
+- Namba za simu (mfano 07XXXXXXXX au tarakimu 9 mpaka 10 zilizoandikwa mfululizo) zilizopo mwishoni mwa jina SI sehemu ya jina la DJ - ziache kabisa, usizichukue.
+- Namba za Episode (mfano "Ep 12", "Episode 5", "Sehemu ya 3") SI jina la DJ - ni sehemu ya movie, ziache pia kwenye jina la DJ.
+- Linganisha jina la DJ ulilolitambua na orodha ifuatayo ya Ma-DJ walioshasajiliwa kwenye mfumo, kama linafanana (hata kama umbo la maandishi ni tofauti kidogo, mfano "babudj" na "Babu Dj" ni mtu mmoja):
+${JSON.stringify(djNames)}
+- Kama linafanana na mmoja wao, weka "match" kuwa jina LILE HASA kama lilivyoandikwa kwenye orodha hiyo (herufi kubwa/ndogo sawa na orodha).
+- Kama hakuna DJ yeyote aliyetajwa/aliyeainika kwenye jina la movie hiyo, weka "match":"NONE" na "newDj":"".
+- Kama umegundua kuna jina la DJ lakini halifanani na yeyote kwenye orodha (DJ mpya), weka "match":"NONE" na "newDj": jina safi la DJ huyo mpya (bila namba za simu, bila namba za episode).
+
+Jibu KWA JSON ARRAY PEKEE bila maelezo mengine, muundo:
+[{"title":"jina la movie kama lilivyoandikwa hapa chini","match":"jina la DJ kutoka orodha AU NONE","newDj":"jina la DJ mpya (jaza tu kama match ni NONE na kuna DJ mpya aliyegunduliwa)"}]
+
+Majina ya Movie:
+${listText}`;
+}
+document.getElementById('mDetectDjBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('mDetectDjBtn');
+  const raw = document.getElementById('mBulkTitles').value;
+  const titles = raw.split('\n').map(t => t.trim()).filter(Boolean);
+  if (titles.length === 0) return alert('Bandika majina ya movie kwanza kwenye sehemu ya juu.');
+  if (aiKeys.length === 0) return alert('Ongeza angalau Funguo moja la Reelzone kwanza (sehemu ya AI hapo juu).');
+  if (djs.length === 0) return alert('Bado hakuna DJ yeyote kwenye mfumo. Ongeza DJ kwanza (tab DJ) au bofya "Weka Majina ya Awali ya Ma-DJ" pale.');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  const logBox = document.getElementById('djDetectLog');
+  logBox.innerHTML = '';
+  logBox.style.display = 'block';
+  const chunkSize = 15;
+  const djNames = djs.map(d => d.name);
+  let foundCount = 0;
+  for (let i = 0; i < titles.length; i += chunkSize) {
+    const chunk = titles.slice(i, i + chunkSize);
+    btn.textContent = `Inatambua DJ (${Math.min(i + chunkSize, titles.length)}/${titles.length})...`;
+    try {
+      const prompt = buildDjDetectPrompt(chunk, djNames);
+      const text = await callAITextPrompt(prompt);
+      let items;
+      try { items = JSON.parse(text); } catch (e) { throw new Error('AI imerudisha jibu lisiloeleweka.'); }
+      for (const item of items) {
+        const t = String(item.title || '').trim();
+        const matchTitle = chunk.find(c => c.trim().toLowerCase() === t.toLowerCase()) || t;
+        if (item.match && item.match !== 'NONE') {
+          const dj = djs.find(d => d.name.trim().toLowerCase() === String(item.match).trim().toLowerCase());
+          if (dj) {
+            bulkDjAssignments[matchTitle.trim().toLowerCase()] = dj.id;
+            foundCount++;
+            logDjDetect(`\u2713 "${matchTitle}" \u2192 ${dj.name}`, 'ok');
+            continue;
+          }
+        }
+        if (item.newDj && String(item.newDj).trim()) {
+          const newName = String(item.newDj).trim();
+          const key = newName.toLowerCase();
+          if (!djMissingQueue[key]) djMissingQueue[key] = { name: newName, titles: [] };
+          djMissingQueue[key].titles.push(matchTitle);
+          logDjDetect(`\u26a0 "${matchTitle}" ina DJ mpya isiyojulikana: "${newName}"`, 'warn');
+        }
+      }
+    } catch (e) {
+      if (e.noKeys) { alert(e.message); break; }
+      logDjDetect(`Hitilafu kwenye kundi hili: ${e.message}`, 'warn');
+    }
+  }
+  renderDjMissingBox();
+  btn.disabled = false;
+  btn.textContent = originalText;
+  alert(`Imekamilika. DJ zimetambuliwa kwa movie ${foundCount} kati ya ${titles.length}. Zilizobaki ama hazikuwa na DJ, au zinahitaji DJ mpya kuongezwa (angalia orodha chini ya kitufe kama ipo).`);
+});
+document.getElementById('mAddBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('mAddBtn');
+  const title = document.getElementById('mTitle').value.trim();
+  const category = document.getElementById('mCategory').value;
+  const branch = document.getElementById('mBranch').value;
+  const djId = document.getElementById('mDj').value || null;
+  const status = document.getElementById('mStatus').value;
+  const description = document.getElementById('mDesc').value.trim();
+  const imageFile = document.getElementById('mImage').files[0];
+  const trailerInput = document.getElementById('mTrailer').value.trim();
+  const trailerId = extractYouTubeId(trailerInput);
+  if (!title) return alert('Weka jina la movie kwanza.');
+  if (!branch) return alert('Chagua Ofisi kwanza (nenda tab "Ofisi" kama bado hujaongeza).');
+  if (trailerInput && !trailerId) {
+    return alert('Link ya YouTube haieleweki. Hakikisha umebandika link kamili kutoka YouTube.');
+  }
+  const isDup = latestMovies.some(m => m.title.trim().toLowerCase() === title.toLowerCase());
+  if (isDup) {
+    return alert(`Movie "${title}" tayari ipo kwenye mfumo. Haitaongezwa mara ya pili.`);
+  }
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  let imageUrl = '';
+  if (imageFile) {
+    try {
+      btn.textContent = 'Inapakia Picha...';
+      imageUrl = await uploadToCloudinary(imageFile);
+    } catch (e) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      return alert((e && e.message) || 'Hitilafu isiyojulikana imetokea. Jaribu tena.');
+    }
+  } else if (trailerId) {
+    // Hakuna picha iliyopakiwa - tumia thumbnail ya YouTube kiotomatiki (kama YouTube ilivyo)
+    imageUrl = `https://img.youtube.com/vi/${trailerId}/hqdefault.jpg`;
+  }
+  try {
+    btn.textContent = 'Inahifadhi...';
+    await addDoc(collection(db, 'movies'), {
+      title, category, branch, status, description, imageUrl, trailerId: trailerId || '', djId,
+      likes: 0, createdAt: serverTimestamp()
+    });
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = originalText;
+    return alert('Imeshindwa kuhifadhi: ' + e.message);
+  }
+  document.getElementById('mTitle').value = '';
+  document.getElementById('mDesc').value = '';
+  document.getElementById('mImage').value = '';
+  document.getElementById('mTrailer').value = '';
+  btn.disabled = false;
+  btn.textContent = originalText;
+});
+function extractYouTubeId(url) {
+  if (!url) return '';
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/
+  ];
+  for (const p of patterns) {
+    const match = url.match(p);
+    if (match) return match[1];
+  }
+  return '';
+}
+// ---- AI CATEGORIZATION ----
+function loadAIKeys() {
+  try { return JSON.parse(localStorage.getItem('reelzone_ai_keys') || '[]'); } catch (e) { return []; }
+}
+function saveAIKeys() {
+  localStorage.setItem('reelzone_ai_keys', JSON.stringify(aiKeys));
+}
+let aiKeys = loadAIKeys();
+let aiKeyIndex = 0;
+function renderAIKeyList() {
+  const box = document.getElementById('aiKeyList');
+  if (aiKeys.length === 0) {
+    box.innerHTML = '<div class="empty" style="font-size:11px;padding:8px;">Bado hujaweka funguo yoyote. Ongeza angalau moja hapo juu.</div>';
+    return;
+  }
+  box.innerHTML = aiKeys.map((k, i) => `
+    <div style="display:flex;justify-content:space-between;align-items:center;background:var(--surface2);
+      border:1px solid ${i === aiKeyIndex ? 'var(--gold)' : 'var(--rule)'};border-radius:8px;padding:8px 12px;margin-bottom:6px;">
+      <div>
+        <div style="font-weight:700;font-size:13px;${i === aiKeyIndex ? 'color:var(--gold);' : ''}">${escapeHtml(k.name)}${i === aiKeyIndex ? ' &middot; Inatumika Sasa' : ''}</div>
+        <div style="font-size:11px;color:var(--muted);">${escapeHtml(k.key.slice(0, 8))}...${escapeHtml(k.key.slice(-4))}</div>
+      </div>
+      <span class="toggle-mini" style="border-color:var(--wait);color:var(--wait);" onclick="deleteAIKey(${i})">Futa</span>
+    </div>
+  `).join('');
+}
+window.deleteAIKey = (i) => {
+  aiKeys.splice(i, 1);
+  if (aiKeyIndex >= aiKeys.length) aiKeyIndex = 0;
+  saveAIKeys();
+  renderAIKeyList();
+};
+document.getElementById('aiKeyAddBtn').addEventListener('click', () => {
+  const nameEl = document.getElementById('aiKeyName');
+  const keyEl = document.getElementById('aiKeyValue');
+  const name = nameEl.value.trim() || `Funguo ${aiKeys.length + 1}`;
+  const key = keyEl.value.trim();
+  if (!key) return alert('Bandika funguo kwanza.');
+  aiKeys.push({ name, key });
+  saveAIKeys();
+  nameEl.value = ''; keyEl.value = '';
+  renderAIKeyList();
+  if (aiSortState && aiSortState.paused) {
+    document.getElementById('aiContinueBtn').style.display = 'block';
+    logAI(`\u2713 Funguo "${name}" limeongezwa. Bonyeza "Endelea Kupanga" ili kuendelea pale ilipoishia.`, 'ok');
+  }
+});
+renderAIKeyList();
+
+let aiMissingQueue = {};
+let aiSortState = null; // { movies, index, paused }
+function logAI(msg, cls) {
+  const log = document.getElementById('aiLog');
+  log.style.display = 'block';
+  const line = document.createElement('div');
+  if (cls) line.className = cls;
+  line.textContent = msg;
+  log.appendChild(line);
+  log.scrollTop = log.scrollHeight;
+}
+function isQuotaError(err) {
+  if (!err) return false;
+  const msg = ((err && err.message) || '').toLowerCase();
+  return err.httpStatus === 429 || msg.includes('quota') || msg.includes('resource_exhausted') || msg.includes('rate limit');
+}
+async function callAIWithKey(promptParts, key) {
+  const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: [{ parts: promptParts }],
+      generationConfig: { responseMimeType: 'application/json' }
+    })
+  });
+  const data = await res.json().catch(() => null);
+  if (!res.ok) {
+    const err = new Error((data && data.error && data.error.message) || ('HTTP ' + res.status));
+    err.httpStatus = res.status;
+    throw err;
+  }
+  const text = data && data.candidates && data.candidates[0] && data.candidates[0].content
+    && data.candidates[0].content.parts ? data.candidates[0].content.parts.map(p => p.text || '').join('') : '';
+  return text;
+}
+async function callAIJSON(promptParts) {
+  if (aiKeys.length === 0) { const e = new Error('Weka angalau Funguo moja la Reelzone kwanza hapo juu.'); e.noKeys = true; throw e; }
+  let lastErr;
+  for (let attempt = 0; attempt < aiKeys.length; attempt++) {
+    const idx = (aiKeyIndex + attempt) % aiKeys.length;
+    try {
+      const text = await callAIWithKey(promptParts, aiKeys[idx].key);
+      if (idx !== aiKeyIndex) { aiKeyIndex = idx; renderAIKeyList(); }
+      return text;
+    } catch (e) {
+      lastErr = e;
+      if (isQuotaError(e)) {
+        logAI(`\u26a0 Funguo "${aiKeys[idx].name}" limefika kikomo, najaribu funguo lingine...`, 'warn');
+        continue;
+      }
+      throw e;
+    }
+  }
+  const err = new Error('AI_ALL_KEYS_EXHAUSTED');
+  err.allExhausted = true;
+  err.original = lastErr;
+  throw err;
+}
+async function callAITextPrompt(text) {
+  return callAIJSON([{ text }]);
+}
+async function ensureCategory(name) {
+  const existing = categories.find(c => c.name.trim().toLowerCase() === name.trim().toLowerCase());
+  if (existing) return existing.id;
+  const ref = await addDoc(collection(db, 'categories'), { name: name.trim(), enabled: true, createdAt: serverTimestamp() });
+  return ref.id;
+}
+async function runAISort(movies, startIndex) {
+  startIndex = startIndex || 0;
+  if (movies.length === 0) return alert('Hakuna movie za kupanga.');
+  if (categories.length === 0) return alert('Ongeza category kwanza kabla ya kutumia  (tab "Category").');
+  if (aiKeys.length === 0) return alert('Ongeza angalau Funguo moja la Reelzone kwanza (sehemu ya juu).');
+  const btn1 = document.getElementById('aiSortSelectedBtn');
+  const btn2 = document.getElementById('aiSortAllBtn');
+  const btn3 = document.getElementById('aiSortRecentBtn');
+  const continueBtn = document.getElementById('aiContinueBtn');
+  const autoCreate = document.getElementById('aiAutoCreateCat').checked;
+  btn1.disabled = true; btn2.disabled = true; btn3.disabled = true;
+  continueBtn.style.display = 'none';
+  const origin1 = btn1.textContent, origin2 = btn2.textContent, origin3 = btn3.textContent;
+  btn1.textContent = 'Inapanga...'; btn2.textContent = 'Inapanga...'; btn3.textContent = 'Inapanga...';
+  if (startIndex === 0) {
+    document.getElementById('aiLog').innerHTML = '';
+  }
+  document.getElementById('aiLog').style.display = 'block';
+  aiSortState = { movies, index: startIndex, paused: false };
+  const chunkSize = 10;
+  let pausedHere = false;
+  for (let i = startIndex; i < movies.length; i += chunkSize) {
+    const chunk = movies.slice(i, i + chunkSize);
+    const catNames = categories.map(c => c.name);
+    const listText = chunk.map((m, idx) => `${idx + 1}. ${m.title}`).join('\n');
+    const prompt = `Wewe ni mtaalamu wa movie na series duniani kote (Bongo/Kiswahili, Korea, India/Bollywood, Nigeria/Nollywood, Hollywood/Kimarekani, China, Uturuki, n.k), unayefahamu asili/nchi na aina (genre) ya kila kazi kwa jina lake.
+Kazi yako, kwa kila jina la movie/series hapa chini:
+1) Tambua NCHI/ASILI yake halisi (mfano: Korea Drama, movie ya Kinigeria, Bongo Movie ya Kitanzania, Bollywood, n.k), kisha chagua category INAYOFAA ZAIDI kutoka kwenye orodha ifuatayo ya category zilizopo:
+${JSON.stringify(catNames)}
+2) Tambua AINA KUU (genre) MOJA TU ya movie hiyo (mfano: Hofu/Horror, Mapenzi/Love Story, Vichekesho/Comedy, Vitendo/Action, Vita/War, Drama, Kids/Watoto, Documentary) kulingana na movie halisi unayoifahamu, kisha andika sentensi FUPI MOJA kwa Kiswahili inayosema aina hiyo tu (si aina nyingi kwa pamoja) - mfano: "Hii ni movie ya Mapenzi (Love Story)." au "Hii ni movie ya Kutisha (Horror)."
+
+KANUNI MUHIMU ZA CATEGORY:
+- Category ya "Bongo Movies" ni kwa ajili ya kazi za KITANZANIA/KISWAHILI PEKEE. USIWEKE series za Korea, Nigeria, India au nchi nyingine kwenye "Bongo Movies" hata kama jina limeandikwa kwa Kiswahili au lina neno la Kiswahili.
+- Kama kuna category maalum inayolingana na nchi/aina halisi ya kazi hiyo ITUMIE hiyo badala ya kategoria ya jumla.
+- Kama HAKUNA category yoyote kwenye orodha inayofaa kabisa, weka "category":"NONE" na "suggestion" ya jina fupi la category mpya sahihi.
+- Kama huna uhakika kabisa wa asili ya jina fulani, chagua category inayokaribiana zaidi kimantiki, usiache tupu.
+- Kama huna uhakika wa aina/genre kabisa, weka "description":"" (tupu) badala ya kubuni.
+
+Jibu KWA JSON ARRAY PEKEE, bila maelezo mengine, muundo ufuatao:
+[{"title":"jina la movie kama lilivyoandikwa hapa chini","category":"jina la category kutoka orodha AU NONE","suggestion":"jina la category mpya (jaza tu kama category ni NONE)","description":"sentensi fupi moja ya aina/genre kwa Kiswahili, au tupu kama huna uhakika"}]
+
+Movies:
+${listText}`;
+    try {
+      const text = await callAITextPrompt(prompt);
+      let items;
+      try { items = JSON.parse(text); } catch (e) { throw new Error('AI imerudisha jibu lisiloeleweka.'); }
+      for (const item of items) {
+        const movie = chunk.find(m => m.title.trim().toLowerCase() === String(item.title || '').trim().toLowerCase());
+        if (!movie) continue;
+        const updates = {};
+        let catLabel = null;
+        if (item.category && item.category !== 'NONE') {
+          const match = categories.find(c => c.name.trim().toLowerCase() === String(item.category).trim().toLowerCase());
+          if (match) { updates.category = match.id; catLabel = match.name; }
+        }
+        if (!catLabel) {
+          const suggestion = String(item.suggestion || item.category || 'Category Mpya').trim();
+          if (autoCreate) {
+            try {
+              const catId = await ensureCategory(suggestion);
+              if (!categories.find(c => c.id === catId)) categories.push({ id: catId, name: suggestion, enabled: true });
+              updates.category = catId;
+              catLabel = suggestion + ' (mpya)';
+            } catch (e) {
+              logAI(`Imeshindwa kuunda category "${suggestion}": ${e.message}`, 'warn');
+            }
+          } else {
+            const key = suggestion.toLowerCase();
+            if (!aiMissingQueue[key]) aiMissingQueue[key] = { name: suggestion, movieIds: [], titles: [] };
+            aiMissingQueue[key].movieIds.push(movie.id);
+            aiMissingQueue[key].titles.push(movie.title);
+          }
+        }
+        const desc = String(item.description || '').trim();
+        if (desc && !movie.description) updates.description = desc;
+        if (Object.keys(updates).length > 0) {
+          await updateDoc(doc(db, 'movies', movie.id), updates);
+          movie.description = updates.description || movie.description;
+        }
+        if (catLabel) {
+          logAI(`\u2713 "${movie.title}" \u2192 ${catLabel}${desc ? ' | ' + desc : ''}`, 'ok');
+        } else {
+          logAI(`\u26a0 "${movie.title}" inahitaji category mpya${desc ? ' | ' + desc : ''}`, 'warn');
+        }
+      }
+      aiSortState.index = i + chunkSize;
+    } catch (e) {
+      if (e.allExhausted) {
+        logAI(`\u26d4 Funguo zote zimefika kikomo. Ongeza funguo jipya hapo juu kisha bonyeza "Endelea Kupanga" ili kuendelea pale ilipoishia (movie ${i + 1} kati ya ${movies.length}).`, 'warn');
+        aiSortState.paused = true;
+        pausedHere = true;
+        continueBtn.style.display = 'block';
+        break;
+      }
+      logAI(`Hitilafu kwenye kundi hili: ${e.message}`, 'warn');
+      aiSortState.index = i + chunkSize;
+    }
+  }
+  renderMissingCatBox();
+  btn1.disabled = false; btn2.disabled = false; btn3.disabled = false;
+  btn1.textContent = origin1; btn2.textContent = origin2; btn3.textContent = origin3;
+  if (!pausedHere) {
+    aiSortState = null;
+    alert(' imemaliza kupanga. Angalia log na sehemu ya "category mpya zinazohitajika" kama ipo.');
+  }
+}
+document.getElementById('aiContinueBtn').addEventListener('click', () => {
+  if (!aiSortState || !aiSortState.paused) return;
+  runAISort(aiSortState.movies, aiSortState.index);
+});
+function renderMissingCatBox() {
+  const box = document.getElementById('aiMissingCatBox');
+  const keys = Object.keys(aiMissingQueue);
+  if (keys.length === 0) { box.innerHTML = ''; return; }
+  box.innerHTML = `<p style="color:var(--wait);font-size:12px;margin:10px 0 4px;">Category zifuatazo hazipo &mdash; ongeza ili movie hizi zipangwe (au tik "Unda kiotomatiki" hapo juu kabla ya kupanga tena):</p>` +
+    keys.map(k => {
+      const g = aiMissingQueue[k];
+      return `<div class="missing-cat-row">
+        <span>"${escapeHtml(g.name)}" &mdash; movie ${g.movieIds.length}: ${escapeHtml(g.titles.slice(0, 3).join(', '))}${g.titles.length > 3 ? '...' : ''}</span>
+        <button class="btn small" onclick="addMissingCategory('${k.replace(/'/g, "\\'")}')">Ongeza Category</button>
+      </div>`;
+    }).join('');
+}
+window.addMissingCategory = async (key) => {
+  const g = aiMissingQueue[key];
+  if (!g) return;
+  try {
+    const catId = await ensureCategory(g.name);
+    for (const movieId of g.movieIds) {
+      await updateDoc(doc(db, 'movies', movieId), { category: catId });
+    }
+    logAI(`\u2713 Category "${g.name}" imeongezwa na movie ${g.movieIds.length} zimepangwa ndani yake.`, 'ok');
+    delete aiMissingQueue[key];
+    renderMissingCatBox();
+  } catch (e) {
+    alert('Imeshindwa kuongeza category: ' + e.message);
+  }
+};
+document.getElementById('aiSortRecentBtn').addEventListener('click', () => {
+  const hours = parseFloat(document.getElementById('aiHoursWindow').value) || 24;
+  const cutoff = Date.now() - hours * 60 * 60 * 1000;
+  const movies = latestMovies.filter(m => {
+    const t = m.createdAt && typeof m.createdAt.toMillis === 'function' ? m.createdAt.toMillis() : null;
+    return t !== null && t >= cutoff;
+  });
+  if (movies.length === 0) return alert(`Hakuna movie zilizowekwa ndani ya masaa ${hours} yaliyopita.`);
+  if (!confirm(`Panga movie ${movies.length} zilizowekwa ndani ya masaa ${hours} yaliyopita?`)) return;
+  runAISort(movies);
+});
+document.getElementById('deleteRecentBtn').addEventListener('click', async () => {
+  const hours = parseFloat(document.getElementById('deleteHoursWindow').value) || 1;
+  const cutoff = Date.now() - hours * 60 * 60 * 1000;
+  const movies = latestMovies.filter(m => {
+    const t = m.createdAt && typeof m.createdAt.toMillis === 'function' ? m.createdAt.toMillis() : null;
+    return t !== null && t >= cutoff;
+  });
+  if (movies.length === 0) return alert(`Hakuna movie zilizowekwa ndani ya masaa ${hours} yaliyopita.`);
+  const preview = movies.slice(0, 15).map(m => '- ' + m.title).join('\n') + (movies.length > 15 ? `\n... na zingine ${movies.length - 15}` : '');
+  if (!confirm(`Futa movie ${movies.length} zilizowekwa ndani ya masaa ${hours} yaliyopita?\n\n${preview}\n\nHatua hii HAIWEZI kutenguliwa.`)) return;
+  const btn = document.getElementById('deleteRecentBtn');
+  const original = btn.textContent;
+  btn.disabled = true; btn.textContent = 'Inafuta...';
+  for (const m of movies) {
+    try { await deleteDoc(doc(db, 'movies', m.id)); } catch (e) { /* endelea na zingine */ }
+  }
+  btn.disabled = false; btn.textContent = original;
+  alert(`Movie ${movies.length} zimefutwa.`);
+});
+document.getElementById('aiSortSelectedBtn').addEventListener('click', () => {
+  const movies = latestMovies.filter(m => selectedMovieIds.has(m.id));
+  if (movies.length === 0) return alert('Chagua movie kwanza (tik kwenye checkbox) kwenye orodha chini kabla ya kubofya hii.');
+  runAISort(movies);
+});
+document.getElementById('aiSortAllBtn').addEventListener('click', () => {
+  if (latestMovies.length === 0) return alert('Hakuna movie kwenye mfumo.');
+  if (!confirm(`Panga movie zote ${latestMovies.length} Hii inaweza kuchukua muda kidogo.`)) return;
+  runAISort(latestMovies);
+});
+// ---- SOMA PICHA YA MAJINA (AI) ----
+document.getElementById('mReadImageBtn').addEventListener('click', async () => {
+  const fileInput = document.getElementById('mTitlesImage');
+  const file = fileInput.files[0];
+  if (!file) return alert('Chagua picha yenye majina ya movies kwanza.');
+  if (aiKeys.length === 0) return alert('Ongeza angalau Funguo moja la Reelzone sehemu yake kabla ya kutumia hii.');
+  const btn = document.getElementById('mReadImageBtn');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Inasoma Picha...';
+  try {
+    const base64 = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(',')[1]);
+      reader.onerror = () => reject(new Error('Imeshindwa kusoma faili la picha. Jaribu picha nyingine, au uhakikishe faili si kubwa mno.'));
+      reader.readAsDataURL(file);
+    });
+    const promptParts = [
+      { text: 'Soma picha hii kwa makini na utoe orodha ya MAJINA YOTE ya movies/series/single/catoon yaliyoandikwa humo. Kila jina liwe kama lilivyoandikwa (weka na namba ya Episode kama ipo). Usiweke namba za mstari, alama za orodha, wala maelezo mengine. Jibu KWA JSON ARRAY ya strings pekee, mfano: ["Jina la Kwanza", "Jina la Pili"]' },
+      { inline_data: { mime_type: file.type || 'image/jpeg', data: base64 } }
+    ];
+    const text = await callAIJSON(promptParts);
+    let titles;
+    try { titles = JSON.parse(text); } catch (e) { throw new Error('Imeshindwa kusoma majina kwenye picha hii. Jaribu picha iliyo wazi zaidi.'); }
+    if (!Array.isArray(titles) || titles.length === 0) throw new Error('Hakuna jina lolote lililoonekana kwenye picha.');
+    const textarea = document.getElementById('mBulkTitles');
+    const existingLines = textarea.value.split('\n').map(t => t.trim()).filter(Boolean);
+    const combined = existingLines.concat(titles.map(t => String(t).trim()).filter(Boolean));
+    textarea.value = combined.join('\n');
+    fileInput.value = '';
+    alert(`Majina ${titles.length} yamesomwa na kuwekwa kwenye orodha. Yaangalie, chagua Category na Ofisi, kisha bofya "Ongeza Zote".`);
+  } catch (e) {
+    alert((e && e.message) || 'Hitilafu isiyojulikana imetokea. Jaribu tena.');
+  }
+  btn.disabled = false;
+  btn.textContent = originalText;
+});
+window.updateMovieStatus = async (id, status) => {
+  await updateDoc(doc(db, 'movies', id), { status });
+};
+window.deleteMovie = async (id) => {
+  if (!confirm('Futa movie hii?')) return;
+  await deleteDoc(doc(db, 'movies', id));
+};
+// ---- PRODUCTS ----
+function listenProducts() {
+  const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'));
+  onSnapshot(q, (snap) => {
+    const products = [];
+    snap.forEach(d => products.push({ id: d.id, ...d.data() }));
+    renderProducts(products);
+  });
+}
+function renderProducts(products) {
+  document.getElementById('productCount').textContent = products.length + ' BIDHAA KWENYE MFUMO';
+  const list = document.getElementById('productList');
+  if (products.length === 0) {
+    list.innerHTML = '<div class="empty">Bado hujaongeza bidhaa yoyote.</div>';
+    return;
+  }
+  list.innerHTML = products.map(p => {
+    const inStock = p.stock !== false;
+    return `
+    <div class="card">
+      ${p.imageUrl ? `<img class="thumb" src="${p.imageUrl}">` : ''}
+      <div class="card-top">
+        <div>
+          <div class="card-title">${escapeHtml(p.name)}</div>
+          <div class="card-meta">TZS ${Number(p.price).toLocaleString()}</div>
+        </div>
+        <span class="stamp ${inStock ? 'ipo' : 'bado'}">${inStock ? 'IPO' : 'IMEISHA'}</span>
+      </div>
+      ${p.description ? `<div class="card-desc">${escapeHtml(p.description)}</div>` : ''}
+      <div class="card-actions">
+        <span class="toggle-mini" onclick="toggleProductStock('${p.id}', ${!inStock})">${inStock ? 'Weka Imeisha' : 'Weka Ipo'}</span>
+        <button class="btn small danger" onclick="deleteProduct('${p.id}')">Futa</button>
+      </div>
+    </div>
+  `;
+  }).join('');
+}
+window.toggleProductStock = async (id, inStock) => {
+  await updateDoc(doc(db, 'products', id), { stock: inStock });
+};
+document.getElementById('pAddBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('pAddBtn');
+  const name = document.getElementById('pName').value.trim();
+  const price = document.getElementById('pPrice').value;
+  const description = document.getElementById('pDesc').value.trim();
+  const branch = document.getElementById('pBranch').value;
+  const stock = document.getElementById('pStock').value === 'true';
+  const imageFile = document.getElementById('pImage').files[0];
+  if (!name || !price) return alert('Jaza jina na bei.');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  let imageUrl = '';
+  if (imageFile) {
+    try {
+      btn.textContent = 'Inapakia Picha...';
+      imageUrl = await uploadToCloudinary(imageFile);
+    } catch (e) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      return alert((e && e.message) || 'Hitilafu isiyojulikana imetokea. Jaribu tena.');
+    }
+  }
+  try {
+    btn.textContent = 'Inahifadhi...';
+    await addDoc(collection(db, 'products'), {
+      name, price: Number(price), description, imageUrl, branch, stock, createdAt: serverTimestamp()
+    });
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = originalText;
+    return alert('Imeshindwa kuhifadhi: ' + e.message);
+  }
+  document.getElementById('pName').value = '';
+  document.getElementById('pPrice').value = '';
+  document.getElementById('pDesc').value = '';
+  document.getElementById('pImage').value = '';
+  btn.disabled = false;
+  btn.textContent = originalText;
+});
+window.deleteProduct = async (id) => {
+  if (!confirm('Futa bidhaa hii?')) return;
+  await deleteDoc(doc(db, 'products', id));
+};
+// ---- ANNOUNCEMENTS (TANGAZO) ----
+function listenAds() {
+  const q = query(collection(db, 'announcements'), orderBy('createdAt', 'desc'));
+  onSnapshot(q, (snap) => {
+    const ads = [];
+    snap.forEach(d => { if (d.id !== 'topBanner') ads.push({ id: d.id, ...d.data() }); });
+    renderAds(ads);
+  });
+}
+function renderAds(ads) {
+  document.getElementById('adCount').textContent = ads.length + ' TANGAZO KWENYE MFUMO';
+  const list = document.getElementById('adList');
+  if (ads.length === 0) {
+    list.innerHTML = '<div class="empty">Bado hakuna tangazo.</div>';
+    return;
+  }
+  list.innerHTML = ads.map(a => `
+    <div class="card">
+      ${a.imageUrl ? `<img class="thumb" src="${a.imageUrl}">` : ''}
+      ${a.text ? `<div class="card-desc">${escapeHtml(a.text)}</div>` : ''}
+      <div class="card-meta" style="margin-top:6px;">${a.type === 'image' ? 'Tangazo la Picha' : a.type === 'emergency' ? '\u26A0\uFE0F Tangazo la Dharura' : 'Tangazo la Maandishi'}</div>
+      <div class="card-actions">
+        <button class="btn small danger" onclick="deleteAd('${a.id}')">Futa</button>
+      </div>
+    </div>
+  `).join('');
+}
+document.getElementById('adImageBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('adImageBtn');
+  const imageFile = document.getElementById('adImage').files[0];
+  const caption = document.getElementById('adImageCaption').value.trim();
+  if (!imageFile) return alert('Chagua picha kwanza.');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = 'Inapakia Picha...';
+  let imageUrl = '';
+  try {
+    imageUrl = await uploadToCloudinary(imageFile);
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = originalText;
+    return alert((e && e.message) || 'Hitilafu isiyojulikana imetokea. Jaribu tena.');
+  }
+  btn.textContent = 'Inahifadhi...';
+  await addDoc(collection(db, 'announcements'), {
+    type: 'image', imageUrl, text: caption, createdAt: serverTimestamp()
+  });
+  document.getElementById('adImage').value = '';
+  document.getElementById('adImageCaption').value = '';
+  btn.disabled = false;
+  btn.textContent = originalText;
+});
+document.getElementById('adTextBtn').addEventListener('click', async () => {
+  const textEl = document.getElementById('adText');
+  const text = textEl.value.trim();
+  if (!text) return alert('Andika maandishi ya tangazo kwanza.');
+  await addDoc(collection(db, 'announcements'), {
+    type: 'text', text, imageUrl: '', createdAt: serverTimestamp()
+  });
+  textEl.value = '';
+});
+document.getElementById('adEmergencyBtn').addEventListener('click', async () => {
+  const textEl = document.getElementById('adEmergency');
+  const text = textEl.value.trim();
+  if (!text) return alert('Andika maandishi ya tangazo la dharura kwanza.');
+  await addDoc(collection(db, 'announcements'), {
+    type: 'emergency', text, imageUrl: '', createdAt: serverTimestamp()
+  });
+  textEl.value = '';
+});
+window.deleteAd = async (id) => {
+  if (!confirm('Futa tangazo hili?')) return;
+  await deleteDoc(doc(db, 'announcements', id));
+};
+// ---- USERS (ban/unban) ----
+function listenUsers() {
+  const q = query(collection(db, 'users'), orderBy('createdAt', 'desc'));
+  onSnapshot(q, (snap) => {
+    const users = [];
+    snap.forEach(d => users.push({ id: d.id, ...d.data() }));
+    renderUsers(users);
+  });
+}
+function renderUsers(users) {
+  document.getElementById('userCount').textContent = users.length + ' WATEJA WALIOJISAJILI';
+  const list = document.getElementById('userAdminList');
+  if (users.length === 0) {
+    list.innerHTML = '<div class="empty">Bado hakuna mteja aliyejisajili.</div>';
+    return;
+  }
+  list.innerHTML = users.map(u => `
+    <div class="card">
+      <div class="card-top">
+        <div style="display:flex;gap:10px;align-items:center;">
+          ${u.photoUrl ? `<img class="profile-thumb" src="${u.photoUrl}">` : `<div class="profile-thumb" style="display:flex;align-items:center;justify-content:center;background:var(--surface2);color:var(--gold);font-weight:bold;">${escapeHtml((u.name || '?').charAt(0).toUpperCase())}</div>`}
+          <div>
+            <div class="card-title">${escapeHtml(u.name || 'Bila jina')}</div>
+            <div class="card-meta">${escapeHtml(u.email || '')}</div>
+          </div>
+        </div>
+        <span class="stamp ${u.banned ? 'bado' : 'ipo'}">${u.banned ? 'AMEFUNGWA' : 'ACTIVE'}</span>
+      </div>
+      <div class="card-actions">
+        <button class="btn small ${u.banned ? '' : 'danger'}" onclick="toggleBan('${u.id}', ${!u.banned})">
+          ${u.banned ? 'Mfungue' : 'Mfunge'}
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+window.toggleBan = async (id, ban) => {
+  await updateDoc(doc(db, 'users', id), { banned: ban });
+};
+// ---- CHAT (Admin anaongea na Wateja) ----
+let chatThreads = [];
+let activeChatUid = null;
+let activeChatUnsub = null;
+function listenChatThreads() {
+  const q = query(collection(db, 'chats'), orderBy('lastAt', 'desc'));
+  onSnapshot(q, (snap) => {
+    chatThreads = [];
+    snap.forEach(d => chatThreads.push({ id: d.id, ...d.data() }));
+    renderChatThreads();
+  });
+}
+function renderChatThreads() {
+  const holder = document.getElementById('chatThreadsList');
+  if (chatThreads.length === 0) {
+    holder.innerHTML = '<div class="empty">Bado hakuna mazungumzo na wateja.</div>';
+    return;
+  }
+  holder.innerHTML = chatThreads.map(t => `
+    <div class="thread-item" onclick="openChatThread('${t.id}', '${escapeHtml(t.userName || 'Mteja').replace(/'/g, "\\'")}')">
+      <div>
+        <div class="thread-name">${escapeHtml(t.userName || 'Mteja')}</div>
+        <div class="thread-last">${escapeHtml(t.lastMessage || '')}</div>
+      </div>
+      <span style="color:var(--gold);font-size:18px;">&rsaquo;</span>
+    </div>
+  `).join('');
+}
+window.openChatThread = (uid, name) => {
+  activeChatUid = uid;
+  document.getElementById('chatThreadsList').style.display = 'none';
+  document.getElementById('chatConversation').style.display = 'block';
+  document.getElementById('chatConvName').textContent = name;
+  if (activeChatUnsub) activeChatUnsub();
+  const q = query(collection(db, 'chats', uid, 'messages'), orderBy('createdAt', 'asc'));
+  activeChatUnsub = onSnapshot(q, (snap) => {
+    const msgs = [];
+    snap.forEach(d => msgs.push({ id: d.id, ...d.data() }));
+    const holder = document.getElementById('chatConvMessages');
+    holder.innerHTML = msgs.map(m => `
+      <div class="chat-bubble ${m.sender === 'admin' ? 'admin' : 'user'}">${escapeHtml(m.text)}</div>
+    `).join('');
+    holder.scrollTop = holder.scrollHeight;
+  });
+};
+document.getElementById('chatBackBtn').addEventListener('click', () => {
+  if (activeChatUnsub) { activeChatUnsub(); activeChatUnsub = null; }
+  activeChatUid = null;
+  document.getElementById('chatThreadsList').style.display = 'block';
+  document.getElementById('chatConversation').style.display = 'none';
+});
+async function sendAdminReply() {
+  const input = document.getElementById('chatConvInput');
+  const text = input.value.trim();
+  if (!text || !activeChatUid) return;
+  input.value = '';
+  await addDoc(collection(db, 'chats', activeChatUid, 'messages'), {
+    text, sender: 'admin', createdAt: serverTimestamp()
+  });
+  await setDoc(doc(db, 'chats', activeChatUid), {
+    lastMessage: '\u2605 ' + text, lastAt: serverTimestamp()
+  }, { merge: true });
+}
+document.getElementById('chatConvSendBtn').addEventListener('click', sendAdminReply);
+document.getElementById('chatConvInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') sendAdminReply();
+});
+// ---- BAHATI NASIBU (LOTTERY) ADMIN ----
+function todayStrA(d = new Date()) { return d.toISOString().slice(0, 10); }
+function mondayOfA(d) {
+  const day = d.getDay();
+  const diff = (day === 0 ? -6 : 1 - day);
+  const m = new Date(d);
+  m.setHours(0, 0, 0, 0);
+  m.setDate(d.getDate() + diff);
+  return m;
+}
+function lotteryWeekIdA(d = new Date()) { return todayStrA(mondayOfA(d)); }
+function lotteryWindowA(d = new Date()) {
+  const m = mondayOfA(d);
+  const open = new Date(m); open.setHours(12, 0, 0, 0);
+  const close = new Date(m); close.setHours(16, 0, 0, 0);
+  return { open, close };
+}
+let lotterySettingsA = { requireTrailers: false };
+let lotteryWeekDataA = null;
+let lotteryWeekUnsubA = null;
+
+function listenLottery() {
+  onSnapshot(doc(db, 'lotterySettings', 'config'), (snap) => {
+    lotterySettingsA = snap.exists() ? snap.data() : { requireTrailers: false };
+    const toggle = document.getElementById('lotteryRequireTrailersToggle');
+    if (toggle) toggle.checked = !!lotterySettingsA.requireTrailers;
+  });
+  switchLotteryWeekA();
+  setInterval(switchLotteryWeekA, 20000);
+}
+function switchLotteryWeekA() {
+  const wid = lotteryWeekIdA();
+  if (lotteryWeekUnsubA && lotteryWeekUnsubA._wid === wid) return;
+  if (lotteryWeekUnsubA) lotteryWeekUnsubA();
+  const unsub = onSnapshot(doc(db, 'lotteryWeeks', wid), (snap) => {
+    lotteryWeekDataA = snap.exists() ? snap.data() : { participants: {}, winners: {}, drawn: false };
+    renderLotteryAdmin();
+  });
+  unsub._wid = wid;
+  lotteryWeekUnsubA = unsub;
+}
+document.getElementById('lotteryRequireTrailersToggle').addEventListener('change', async (e) => {
+  const checked = e.target.checked;
+  try {
+    await setDoc(doc(db, 'lotterySettings', 'config'), { requireTrailers: checked }, { merge: true });
+  } catch (err) {
+    alert('Imeshindwa kubadilisha. Jaribu tena.');
+    e.target.checked = !checked;
+  }
+});
+function renderLotteryAdmin() {
+  const badge = document.getElementById('lotteryWeekBadge');
+  const winnersBox = document.getElementById('lotteryAdminWinners');
+  const countBox = document.getElementById('lotteryParticipantsCount');
+  if (!badge) return;
+  const now = new Date();
+  const { open, close } = lotteryWindowA(now);
+  const data = lotteryWeekDataA || {};
+  const participants = data.participants || {};
+  const partCount = Object.keys(participants).length;
+  countBox.textContent = partCount + ' WATEJA WAMESHIRIKI WIKI HII';
+
+  if (now < open) {
+    badge.innerHTML = '<span class="lottery-week-badge pending">&#9203; Bado Haujafunguliwa Wiki Hii</span>';
+  } else if (now >= open && now < close) {
+    badge.innerHTML = '<span class="lottery-week-badge open">&#128994; Mchezo Umefunguliwa Sasa</span>';
+  } else if (!data.drawn) {
+    badge.innerHTML = '<span class="lottery-week-badge pending">&#8987; Dirisha Limefungwa - Washindi Wanachaguliwa...</span>';
+  } else {
+    badge.innerHTML = '<span class="lottery-week-badge closed">&#128308; Wiki Imefungwa - Washindi Wameshachaguliwa</span>';
+  }
+
+  const winners = data.winners || {};
+  const winnerUids = Object.keys(winners);
+  if (!data.drawn) {
+    winnersBox.innerHTML = '<div class="empty">Washindi bado hawajachaguliwa wiki hii.</div>';
+    return;
+  }
+  if (winnerUids.length === 0) {
+    winnersBox.innerHTML = '<div class="empty">Hakuna aliyeshiriki wiki hii.</div>';
+    return;
+  }
+  winnersBox.innerHTML = winnerUids.map(uid => {
+    const w = winners[uid];
+    let statusText = 'Bado hajaomba zawadi';
+    if (w.claimed) statusText = '&#9989; Amepewa zawadi';
+    else if (w.claimRequested) statusText = '&#128276; Anasubiri kupewa (ameomba)';
+    const actionBtn = w.claimed
+      ? ''
+      : `<button class="btn small" onclick="markLotteryGiftGiven('${uid}')">&#127873; Weka Amepewa</button>`;
+    return `<div class="winner-admin-row">
+      <div><span class="w-name">&#127942; ${escapeHtml(w.name)}</span><span class="w-status">${statusText}</span></div>
+      ${actionBtn}
+    </div>`;
+  }).join('');
+}
+window.markLotteryGiftGiven = async (uid) => {
+  const wid = lotteryWeekIdA();
+  if (!confirm('Thibitisha: mteja huyu amepewa movies 1000 ofisini?')) return;
+  try {
+    await updateDoc(doc(db, 'lotteryWeeks', wid), {
+      [`winners.${uid}.claimed`]: true,
+      [`winners.${uid}.claimedAt`]: serverTimestamp()
+    });
+  } catch (e) {
+    alert('Imeshindwa. Jaribu tena.');
+  }
+};
+
+// ---- MA-DJ (DJ) ----
+let djs = [];
+let activeDjId = null;
+const DEFAULT_DJ_NAMES = [
+  'ADJ VASCO', 'ALLY DJ', 'DJ BABA D', 'DJ BABU', 'DJ BLESS', 'DJ DULLAYO', 'DJ JEBBY',
+  'DJ KIBASO', 'DJ MACK', 'DJ MASTER', 'DJ MLAGALILA', 'DJ MSATI', 'DJ MURPHY', 'DJ NASRY',
+  'DJ OMMY', 'DJ PRABHAS', 'DJ RAJA', 'DJ REKI', 'DJ REMMY', 'DJ SIX FINGER', 'DJ SKILLS'
+];
+function listenDjs() {
+  const q = query(collection(db, 'djs'), orderBy('name'));
+  onSnapshot(q, (snap) => {
+    djs = [];
+    snap.forEach(d => djs.push({ id: d.id, ...d.data() }));
+    renderDjSelect();
+    renderDjList();
+  });
+}
+function renderDjSelect() {
+  const sel = document.getElementById('mDj');
+  if (!sel) return;
+  const prev = sel.value;
+  sel.innerHTML = '<option value="">-- Hakuna DJ --</option>' +
+    djs.map(dj => `<option value="${dj.id}">${escapeHtml(dj.name)}</option>`).join('');
+  sel.value = djs.some(dj => dj.id === prev) ? prev : (activeDjId || '');
+}
+function djName(id) {
+  const dj = djs.find(x => x.id === id);
+  return dj ? dj.name : 'DJ Asiyejulikana';
+}
+function djPhotoRowHtml(dj) {
+  return dj.photoUrl
+    ? `<img class="dj-row-photo" src="${dj.photoUrl}">`
+    : `<div class="dj-row-photo-ph">&#127911;</div>`;
+}
+function renderActiveDjBar() {
+  const label = document.getElementById('activeDjLabel');
+  if (!label) return;
+  label.textContent = activeDjId ? djName(activeDjId) : 'Hakuna Aliyechaguliwa';
+}
+function renderDjList() {
+  const list = document.getElementById('djList');
+  const countBox = document.getElementById('djCount');
+  if (!list) return;
+  countBox.textContent = djs.length + ' DJ KWENYE MFUMO';
+  if (djs.length === 0) {
+    list.innerHTML = '<div class="empty">Bado hakuna DJ. Ongeza mmoja juu, au bofya "Weka Majina ya Awali ya Ma-DJ".</div>';
+    return;
+  }
+  list.innerHTML = djs.map(dj => {
+    const count = latestMovies.filter(m => m.djId === dj.id).length;
+    return `<div class="dj-row">
+      ${djPhotoRowHtml(dj)}
+      <div class="dj-row-info">
+        <div class="dr-name">${escapeHtml(dj.name)}</div>
+        <div class="dr-count">${count} movie${count === 1 ? '' : 's'}</div>
+      </div>
+      <div class="dj-row-actions">
+        <span class="toggle-mini ${activeDjId === dj.id ? 'active' : ''}" onclick="selectActiveDj('${dj.id}')">
+          ${activeDjId === dj.id ? '&#9989; Anatumika' : 'Chagua DJ Hii'}
+        </span>
+        <span class="toggle-mini" style="border-color:var(--wait);color:var(--wait);" onclick="deleteDj('${dj.id}')">Futa</span>
+      </div>
+    </div>`;
+  }).join('');
+  renderActiveDjBar();
+}
+window.selectActiveDj = (id) => {
+  activeDjId = id;
+  renderActiveDjBar();
+  renderDjList();
+  renderDjSelect();
+};
+document.getElementById('clearActiveDjBtn').addEventListener('click', () => {
+  activeDjId = null;
+  renderActiveDjBar();
+  renderDjList();
+  renderDjSelect();
+});
+document.getElementById('djAddBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('djAddBtn');
+  const nameEl = document.getElementById('djName');
+  const imageEl = document.getElementById('djImage');
+  const name = nameEl.value.trim();
+  if (!name) return alert('Weka jina la DJ kwanza.');
+  const exists = djs.some(d => d.name.trim().toLowerCase() === name.toLowerCase());
+  if (exists) return alert('DJ mwenye jina hili tayari yupo.');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  let photoUrl = '';
+  const file = imageEl.files[0];
+  if (file) {
+    try {
+      btn.textContent = 'Inapakia Picha...';
+      photoUrl = await uploadToCloudinary(file);
+    } catch (e) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      return alert((e && e.message) || 'Imeshindwa kupakia picha.');
+    }
+  }
+  try {
+    btn.textContent = 'Inahifadhi...';
+    await addDoc(collection(db, 'djs'), { name, photoUrl, createdAt: serverTimestamp() });
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = originalText;
+    return alert('Imeshindwa kuongeza DJ: ' + e.message);
+  }
+  nameEl.value = '';
+  imageEl.value = '';
+  btn.disabled = false;
+  btn.textContent = originalText;
+});
+document.getElementById('djSeedBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('djSeedBtn');
+  const originalText = btn.textContent;
+  const existingNames = new Set(djs.map(d => d.name.trim().toLowerCase()));
+  const toAdd = DEFAULT_DJ_NAMES.filter(n => !existingNames.has(n.trim().toLowerCase()));
+  if (toAdd.length === 0) {
+    alert('Majina yote ya awali ya Ma-DJ tayari yapo.');
+    return;
+  }
+  if (!confirm(`Ongeza DJ ${toAdd.length} zifuatazo?\n\n${toAdd.join(', ')}`)) return;
+  btn.disabled = true;
+  btn.textContent = 'Inaongeza...';
+  try {
+    for (const name of toAdd) {
+      await addDoc(collection(db, 'djs'), { name, photoUrl: '', createdAt: serverTimestamp() });
+    }
+    alert(`DJ ${toAdd.length} zimeongezwa.`);
+  } catch (e) {
+    alert('Imeshindwa: ' + e.message);
+  }
+  btn.disabled = false;
+  btn.textContent = originalText;
+});
+window.deleteDj = async (id) => {
+  const dj = djs.find(d => d.id === id);
+  if (!dj) return;
+  if (!confirm(`Futa DJ "${dj.name}"? Movies zake hazitafutwa, zitabaki bila DJ.`)) return;
+  try {
+    const q = query(collection(db, 'movies'), where('djId', '==', id));
+    const snap = await getDocs(q);
+    if (!snap.empty) {
+      const batch = writeBatch(db);
+      snap.forEach(d => batch.update(d.ref, { djId: null }));
+      await batch.commit();
+    }
+    await deleteDoc(doc(db, 'djs', id));
+    if (activeDjId === id) activeDjId = null;
+  } catch (e) {
+    alert('Imeshindwa kufuta DJ: ' + e.message);
+  }
+};
+
+// ---- TANGAZO MAALUM LA JUU (Top Banner) ----
+function listenTopBanner() {
+  onSnapshot(doc(db, 'announcements', 'topBanner'), (snap) => {
+    const data = snap.exists() ? snap.data() : { text: '', enabled: false };
+    const textEl = document.getElementById('topBannerText');
+    const toggleEl = document.getElementById('topBannerToggle');
+    if (document.activeElement !== textEl) textEl.value = data.text || '';
+    toggleEl.checked = !!data.enabled;
+  });
+}
+document.getElementById('topBannerSaveBtn').addEventListener('click', async () => {
+  const text = document.getElementById('topBannerText').value.trim();
+  if (!text) return alert('Andika maandishi ya tangazo kwanza.');
+  try {
+    await setDoc(doc(db, 'announcements', 'topBanner'), {
+      type: 'topBanner', text, enabled: document.getElementById('topBannerToggle').checked,
+      createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+    }, { merge: true });
+    alert('Tangazo limehifadhiwa.');
+  } catch (e) {
+    alert('Imeshindwa: ' + e.message);
+  }
+});
+document.getElementById('topBannerToggle').addEventListener('change', async (e) => {
+  try {
+    await setDoc(doc(db, 'announcements', 'topBanner'), {
+      type: 'topBanner', enabled: e.target.checked, createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+    }, { merge: true });
+  } catch (err) {
+    alert('Imeshindwa kubadilisha: ' + err.message);
+    e.target.checked = !e.target.checked;
+  }
+});
+
+// ---- POPUP ADS (Ads Zinazojitokeza Kiotomatiki) ----
+document.getElementById('popupType').addEventListener('change', (e) => {
+  const isVideo = e.target.value === 'video';
+  document.getElementById('popupImageField').style.display = isVideo ? 'none' : 'block';
+  document.getElementById('popupVideoField').style.display = isVideo ? 'block' : 'none';
+});
+function listenPopupAds() {
+  const q = query(collection(db, 'popupAds'), orderBy('createdAt', 'asc'));
+  onSnapshot(q, (snap) => {
+    const ads = [];
+    snap.forEach(d => ads.push({ id: d.id, ...d.data() }));
+    renderPopupAdList(ads);
+  });
+  onSnapshot(doc(db, 'popupSettings', 'config'), (snap) => {
+    const d = snap.exists() ? snap.data() : { intervalMinutes: 10, autoCloseSeconds: 12 };
+    document.getElementById('popupInterval').value = String(d.intervalMinutes || 10);
+    document.getElementById('popupAutoClose').value = String(d.autoCloseSeconds ?? 12);
+  });
+}
+function renderPopupAdList(ads) {
+  document.getElementById('popupAdCount').textContent = ads.length + ' POPUP ADS KWENYE MFUMO';
+  const list = document.getElementById('popupAdList');
+  if (ads.length === 0) {
+    list.innerHTML = '<div class="empty">Bado hakuna popup ad. Ongeza moja juu.</div>';
+    return;
+  }
+  list.innerHTML = ads.map(a => `
+    <div class="card">
+      ${a.type === 'video'
+        ? `<img class="thumb" src="https://img.youtube.com/vi/${a.youtubeId}/hqdefault.jpg">`
+        : (a.mediaUrl ? `<img class="thumb" src="${a.mediaUrl}">` : '')}
+      <div class="card-title">${escapeHtml(a.title || '')}</div>
+      ${a.description ? `<div class="card-desc">${escapeHtml(a.description)}</div>` : ''}
+      <div class="card-meta" style="margin-top:6px;">${a.type === 'video' ? '&#127916; Video (YouTube)' : '&#128247; Picha'}</div>
+      <div class="card-actions">
+        <button class="btn small danger" onclick="deletePopupAd('${a.id}')">Futa</button>
+      </div>
+    </div>
+  `).join('');
+}
+document.getElementById('popupAddBtn').addEventListener('click', async () => {
+  const btn = document.getElementById('popupAddBtn');
+  const type = document.getElementById('popupType').value;
+  const title = document.getElementById('popupTitle').value.trim();
+  const description = document.getElementById('popupDesc').value.trim();
+  if (!title) return alert('Weka jina/kichwa cha tangazo kwanza.');
+  const originalText = btn.textContent;
+  btn.disabled = true;
+  const payload = { type, title, description, createdAt: serverTimestamp() };
+  if (type === 'video') {
+    const link = document.getElementById('popupYoutubeLink').value.trim();
+    const youtubeId = extractYouTubeId(link);
+    if (!youtubeId) {
+      btn.disabled = false;
+      return alert('Link ya YouTube si sahihi. Hakikisha umebandika link kamili.');
+    }
+    payload.youtubeId = youtubeId;
+    payload.mediaUrl = '';
+  } else {
+    const file = document.getElementById('popupMedia').files[0];
+    if (!file) {
+      btn.disabled = false;
+      return alert('Chagua picha kwanza.');
+    }
+    try {
+      btn.textContent = 'Inapakia Picha...';
+      payload.mediaUrl = await uploadToCloudinary(file);
+      payload.youtubeId = '';
+    } catch (e) {
+      btn.disabled = false;
+      btn.textContent = originalText;
+      return alert((e && e.message) || 'Imeshindwa kupakia picha.');
+    }
+  }
+  try {
+    btn.textContent = 'Inahifadhi...';
+    await addDoc(collection(db, 'popupAds'), payload);
+  } catch (e) {
+    btn.disabled = false;
+    btn.textContent = originalText;
+    return alert('Imeshindwa kuongeza: ' + e.message);
+  }
+  document.getElementById('popupTitle').value = '';
+  document.getElementById('popupDesc').value = '';
+  document.getElementById('popupMedia').value = '';
+  document.getElementById('popupYoutubeLink').value = '';
+  btn.disabled = false;
+  btn.textContent = originalText;
+});
+window.deletePopupAd = async (id) => {
+  if (!confirm('Futa popup ad hii?')) return;
+  await deleteDoc(doc(db, 'popupAds', id));
+};
+document.getElementById('popupSettingsSaveBtn').addEventListener('click', async () => {
+  const intervalMinutes = Number(document.getElementById('popupInterval').value);
+  const autoCloseSeconds = Number(document.getElementById('popupAutoClose').value);
+  try {
+    await setDoc(doc(db, 'popupSettings', 'config'), {
+      intervalMinutes, autoCloseSeconds, updatedAt: serverTimestamp()
+    }, { merge: true });
+    alert('Mipangilio ya Popup Ads imehifadhiwa.');
+  } catch (e) {
+    alert('Imeshindwa: ' + e.message);
+  }
+});
+
+function escapeHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str || '';
+  return d.innerHTML;
+}
+</script>
+</body>
+</html>
